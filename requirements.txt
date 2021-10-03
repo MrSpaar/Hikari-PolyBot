@@ -1,0 +1,9 @@
+discord.py >= 1.7.3
+aiohttp >= 3.7.4
+cairosvg >= 2.5.2
+chess >= 1.6.1
+matplotlib >= 3.4.2
+motor >= 2.4.0
+youtube_dl >= 2021.6.6
+pynacl >= 1.4.0
+discord-components >= 2.1.0
