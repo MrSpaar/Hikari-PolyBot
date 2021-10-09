@@ -2,6 +2,8 @@ hikari
 hikari-lightblub
 lavasnek_rs
 
+python-dotenv
+dnspython
 aiohttp
 cairosvg
 chess
