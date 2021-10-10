@@ -32,6 +32,7 @@ class Erreurs(Plugin):
             errors.CheckFailure: "❌ Tu n'es pas le créateur de ce channel ou tu n'es pas connecté à un channel",
             errors.CommandIsOnCooldown: "❌ Commande en cooldown",
             errors.OnlyInGuild: "❌ Cette commande n'est utilisable que sur un serveur",
+            errors.NotOwner: "❌ Seul le créateur du bot peut utiliser cette commande",
             errors.ConverterFailure: {
                 'member': '❌ Membre inexistant',
                 'emoji': "❌ Cette commande ne marche qu'avec les emojis custom",
