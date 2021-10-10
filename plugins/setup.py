@@ -1,8 +1,7 @@
 from hikari import Role, GuildTextChannel, Embed, Permissions
 from hikari.events import GuildAvailableEvent, GuildLeaveEvent, MemberCreateEvent, MemberDeleteEvent
-from lightbulb import Plugin, Context, listener, check, guild_only, has_guild_permissions, owner_only
+from lightbulb import Plugin, Context, listener, check, guild_only, has_guild_permissions
 
-from glob import glob
 from typing import Union
 from core.cls import Bot
 from core.funcs import command
@@ -48,15 +47,6 @@ class Configuration(Plugin):
 
         embed = Embed(color=0x3498db, description=f"💬 Bot : {channel}\n📟 Logs : {logs}\n🔇 Mute : {mute}")
         await ctx.send(embed=embed)
-
-    @check(owner_only)
-    @command(hidden=True)
-    async def reload(self, ctx: Context):
-        for plugin in glob('FINISHED/*.py'):
-            self.bot.reload_extension(plugin[:-3].replace('\\', '.'))
-
-        embed = Embed(color=0x2ecc71, description='✅ Tous les plugins ont été relancé')
-        await ctx.respond(embed=embed)
 
     @listener(GuildAvailableEvent)
     async def on_guild_join(self, event):
