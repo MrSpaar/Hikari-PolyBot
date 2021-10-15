@@ -110,7 +110,6 @@ class Niveaux(Plugin):
             return
 
         if not self.cd.update_cooldown(member, guild):
-            print('no 1')
             return
 
         entry = await self.bot.db.members.find({'guilds.id': guild.id, '_id': member.id}, {'guilds.$': 1})
@@ -122,8 +121,6 @@ class Niveaux(Plugin):
 
         await self.bot.db.members.update({'guilds.id': guild.id, '_id': member.id},
                                          {'$inc': {'guilds.$.xp': randint(15, 25), 'guilds.$.level': 1 if xp >= next_lvl else 0}})
-
-        print('yes')
 
         if xp >= next_lvl:
             settings = await self.bot.db.setup.find({'_id': message.guild.id})

@@ -36,17 +36,12 @@ class Divers(Plugin):
                                      f'👉 Exemple : `{self.bot.cprefix}{command.name} {command.brief}`'
         elif plugin := self.bot.get_plugin(arg.title()):
             embed.title += plugin.name
-            embed.description = '\n'.join([f'`{self.bot.cprefix}{command.name}` : {command.description}' for command in plugin.walk_commands()])
+            embed.description = '\n'.join([f'`{self.bot.cprefix}{command.name}` : {command.description}' for command in plugin.commands])
             embed.description += f'\n\nDétail : `{self.bot.cprefix}help commande`'
         else:
-            plugin = list(self.bot.plugins.keys())
-            if ctx.guild.id != 752921557214429316:
-                plugin.remove('Polytech')
-            if ctx.guild.id != 634339847108165632:
-                plugin.remove('Club')
-
+            plugins = ['Configuration', 'Moderation', 'Musique', 'Niveaux', 'Recherche', 'Informations', 'Vocaux', 'Fun', 'Maths', 'Divers', 'Menus']
             embed.title += 'Modules'
-            embed.description = f'Les modules disponibles :\nㅤ• ' + '\n\ㅤ• '.join(plugin) + '\n\nDétail : `!help catégorie`'
+            embed.description = f'Les modules disponibles :\nㅤ• ' + '\n\ㅤ• '.join(plugins) + '\n\nDétail : `!help catégorie`'
 
         await ctx.respond(embed=embed)
 
@@ -69,17 +64,6 @@ class Divers(Plugin):
 
         for i in range(len(items[1:])):
             await message.add_reaction(reactions[i])
-
-    @command(brief='play', usage='<commande>',
-             description="Afficher le code source d'une commande")
-    async def source(self, ctx: Context, command: str):
-        source = str(getsource(self.bot.get_command(command).callback))
-
-        with open(f'{command}.py', 'w', encoding='UTF-8') as file:
-            file.write(source)
-
-        await ctx.respond(attachment=f'{command}.py')
-        remove(f'{command}.py')
 
     @command(brief='@[!] Polybot', usage='<mention>',
              description="Afficher l'image de profil d'un membre")

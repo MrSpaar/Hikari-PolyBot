@@ -32,8 +32,12 @@ class Logs(Plugin):
         embed = Embed(color=0x2ecc71, description=f':inbox_tray: {member.mention} a rejoint le serveur !')
         settings = await self.send_log(guild, embed)
 
-        for role_id in settings['new']:
-            role = guild.get_role(role_id)
+        if settings['welcome']:
+            channel = guild.get_channel(settings['welcome']['id'])
+            await channel.send(settings['welcome']['txt'])
+
+        if settings['new']:
+            role = guild.get_role(settings['new'])
             await member.add_roles(role)
 
     @listener(events.MemberDeleteEvent)

@@ -20,7 +20,7 @@ class Bot(BaseBot):
 
         self.debug = debug
         self.data = Data()
-        # self.db = Database()
+        self.db = Database()
         self.cprefix = '-' if debug else '!'
         self.owner_id = 201674460393242624
 
@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
         self.brief = kwargs.get('brief', '')
         self.usage = kwargs.get('usage', '')
-        self.usage = kwargs.get('usage', '')
+        self.description = kwargs.get('description', '')
 
 
 class Group(BaseGroup):
@@ -52,6 +52,27 @@ class Group(BaseGroup):
         self.usage = kwargs.get('usage', '')
         self.description = kwargs.get('description', '')
 
+    def command(self, **kwargs):
+        def decorate(func):
+            name = kwargs.get('name', func.__name__)
+            self._subcommands[name] = Command(
+                func,
+                kwargs.get('name', func.__name__),
+                kwargs.get('allow_extra_arguments', True),
+                kwargs.get('aliases', []),
+                kwargs.get('hidden', False),
+                parent=self,
+                **kwargs
+            )
+
+            if self.inherit_checks:
+                self._subcommands[name]._checks.extend(self._checks)
+            self.subcommands.add(self._subcommands[name])
+            for alias in kwargs.get("aliases", []):
+                self._subcommands[alias] = self._subcommands[name]
+            return self._subcommands[name]
+
+        return decorate
 
 class Cooldown:
     def __init__(self, usages: int, seconds: int):

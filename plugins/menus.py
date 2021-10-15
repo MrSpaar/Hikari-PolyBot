@@ -29,22 +29,28 @@ class Menus(Plugin):
     @menu.command(brief='@CM 1 @CM 2 Groupes de CM', usage='<rôles> <titre>',
                   description='Faire un menu de rôles avec des boutons')
     async def boutons(self, ctx: Context, roles: Greedy[Role], *, title: str):
-        component = ActionRowBuilder()
-        for role in roles:
-            component.add_button(3, role.id).set_label(role.name).add_to_container()
+        components = []
+        for i in range(0, len(roles), 5):
+            component = ActionRowBuilder()
+            for role in roles[i:i+5]:
+                component.add_button(3, role.id).set_label(role.name).add_to_container()
 
-        await ctx.respond(f'Menu de rôles - {title}', component=component)
+            components += [component]
+        await ctx.respond(f'Menu de rôles - {title}', components=components)
 
     @check(guild_only)
     @check(has_guild_permissions(Permissions.MANAGE_ROLES))
     @menu.command(brief='🥫 @Kouizinier 🎮 @Soirées jeux', usage='<emojis et rôles> <titre>',
                   description='Faire un menu de rôles avec des boutons incluant des emojis')
-    async def emoji(self, ctx: Context, entries: Greedy[Union[Role, str]]):
-        component = ActionRowBuilder()
-        for emoji, role in zip(entries[::2], entries[1::2]):
-            component.add_button(3, role.id).set_label(role.name).set_emoji(emoji).add_to_container()
+    async def emojis(self, ctx: Context, entries: Greedy[Union[Role, str]]):
+        components = []
+        for i in range(0, len(entries), 10):
+            component = ActionRowBuilder()
+            for emoji, role in zip(entries[i:i+10:2], entries[i+1:i+10:2]):
+                component.add_button(3, role.id).set_label(role.name).set_emoji(emoji).add_to_container()
 
-        await ctx.respond(f'Menu de rôles', component=component)
+            components += [component]
+        await ctx.respond(f'Menu de rôles', components=components)
 
     @check(guild_only)
     @check(has_guild_permissions(Permissions.MANAGE_ROLES))

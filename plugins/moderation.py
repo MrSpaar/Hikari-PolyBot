@@ -1,4 +1,3 @@
-from functools import cmp_to_key
 from hikari import Member, Embed, Permissions, GatewayGuild, StartedEvent
 from lightbulb import Plugin, Context, check, guild_only, has_guild_permissions, listener
 
@@ -50,7 +49,9 @@ class Moderation(Plugin):
     @command(brief='@Antoine Grégoire 10m mdrr', usage='<membre> <durée> <raison (optionnel)>',
              description='Rendre un membre muet')
     async def mute(self, ctx: Context, member: Member, time: str = None):
-        role, _ = await self.fetch_settings(ctx.guild)
+        guild = ctx.get_guild()
+        role, _ = await self.fetch_settings(guild)
+
         if not role:
             embed = Embed(color=0xe74c3c, description=f'❌ Aucun rôle mute spécifié (`!set mute @role`)')
             return await ctx.respond(embed=embed)
@@ -71,7 +72,7 @@ class Moderation(Plugin):
             embed = Embed(color=0x2ecc71, description=f'✅ {member.mention} a été mute {time}')
 
             await member.add_role(role)
-            await self.bot.db.pending.insert({'guild_id': ctx.guild.id, 'id': member.id, 'end': date})
+            await self.bot.db.pending.insert({'guild_id': guild.id, 'id': member.id, 'end': date})
         except:
             embed = Embed(color=0xe74c3c, description='❌ La cible a plus de permissions que moi')
 
@@ -83,12 +84,14 @@ class Moderation(Plugin):
     @command(brief='@Antoine Grégoire', usage='<membre>',
              description='Redonner la parole à un membre')
     async def unmute(self, ctx: Context, member: Member):
-        role, _ = await self.fetch_settings(ctx.guild)
+        guild = ctx.get_guild()
+        role, _ = await self.fetch_settings(guild)
+
         if role not in member.get_roles():
             return await ctx.send(f"❌ {member.mention} n'est pas mute")
 
         await member.remove_role(role)
-        await self.bot.db.pending.delete({'guild_id': ctx.guild.id, 'id': member.id})
+        await self.bot.db.pending.delete({'guild_id': guild.id, 'id': member.id})
 
         embed = Embed(color=0x2ecc71, description=f'✅ {member.mention} a été unmute')
         await ctx.respond(embed=embed)

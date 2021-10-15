@@ -110,8 +110,6 @@ class Informations(Plugin):
             Permissions.USE_APPLICATION_COMMANDS: 'Utiliser les applications',
             Permissions.USE_EXTERNAL_EMOJIS: 'Utiliser les emojis externes',
             Permissions.USE_EXTERNAL_STICKERS: 'Utiliser les stickers externes',
-            Permissions.USE_PRIVATE_THREADS: 'Utiliser les fils privés',
-            Permissions.USE_PUBLIC_THREADS: 'Utiliser les fils publiques',
             Permissions.PRIORITY_SPEAKER: 'Parler en prioritaire',
             Permissions.REQUEST_TO_SPEAK: 'Demander la parole',
             Permissions.SPEAK: 'Parler en vocal',
@@ -119,10 +117,12 @@ class Informations(Plugin):
             Permissions.CONNECT: 'Se connecter à un vocal'
         }
 
+        perms = [perms[perm] for perm in role.permissions]
+
         description = f'⏱️ Créé <t:{since}:R>\n' + \
                       f'🌈 Couleur : `{role.color.hex_code}`\n' + \
                       f"🔔 {'Mentionnable' if role.is_mentionable else 'Non mentionnable'}{' et affiché séparemment' if role.is_hoisted else ''}\n\n" + \
-                      f'⛔ Permissions : \n- ' + '\n- '.join([perms[perm] for perm in role.permissions])
+                      f'⛔ Permissions :' + ('\n- ' + '\n- '.join(perms) if perms else ' *pas de permissions*')
 
         embed = (Embed(color=role.color, description=description)
                  .set_author(name=f'{role.name} - {role.id}', icon=guild.icon_url))

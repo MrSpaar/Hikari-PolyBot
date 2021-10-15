@@ -1,4 +1,4 @@
-from hikari import Role, GuildTextChannel, Embed, Permissions
+from hikari import Role, TextableChannel, Embed, Permissions
 from hikari.events import GuildAvailableEvent, GuildLeaveEvent, MemberCreateEvent, MemberDeleteEvent
 from lightbulb import Plugin, Context, listener, check, guild_only, has_guild_permissions
 
@@ -17,7 +17,7 @@ class Configuration(Plugin):
     @command(name='set', brief='channel #🧙-polybot',
              usage='<mute, logs ou channel> <@role ou #channel>',
              description='Modifier les paramètres du bot')
-    async def _set(self, ctx: Context, key: str, value: Union[Role, GuildTextChannel]):
+    async def _set(self, ctx: Context, key: str, value: Union[Role, TextableChannel]):
         settings = {
             'mute': 'Rôle des muets',
             'logs': 'Channel de logs',
@@ -28,7 +28,7 @@ class Configuration(Plugin):
             embed = Embed(color=0xe74c3c, description=f"❌ Clé invalide : {', '.join(settings.keys())}")
             return await ctx.respond(embed=embed)
 
-        await ctx.bot.db.setup.update({'_id': ctx.guild.id}, {'$set': {key: value.id}})
+        await ctx.bot.db.setup.update({'_id': ctx.guild_id}, {'$set': {key: value.id}})
 
         embed = Embed(color=0x2ecc71, description=f"{settings[key]} modifié ({value.mention})")
         await ctx.respond(embed=embed)
@@ -46,7 +46,7 @@ class Configuration(Plugin):
         mute = getattr(guild.get_role(settings['mute']), 'mention', 'pas défini')
 
         embed = Embed(color=0x3498db, description=f"💬 Bot : {channel}\n📟 Logs : {logs}\n🔇 Mute : {mute}")
-        await ctx.send(embed=embed)
+        await ctx.respond(embed=embed)
 
     @listener(GuildAvailableEvent)
     async def on_guild_join(self, event):
