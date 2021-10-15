@@ -59,7 +59,7 @@ def is_higher(ctx: Context) -> Check:
         author_top = ctx.member.get_top_role()
         member_top = member.get_top_role()
 
-        if author_top.position > member.position:
+        if author_top.position > member_top.position:
             return True
         raise errors.MissingRequiredPermission(Permissions.ADMINISTRATOR)
     return Check(extended_check)
