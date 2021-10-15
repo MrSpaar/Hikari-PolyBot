@@ -1,4 +1,3 @@
-from discord import Color
 from hikari import Embed, ShardReadyEvent
 from lightbulb import Plugin, Context, listener, check, guild_only
 
