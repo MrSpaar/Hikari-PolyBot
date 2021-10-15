@@ -106,7 +106,7 @@ class Niveaux(Plugin):
         guild, member = self.bot.cache.get_guild(event.guild_id), event.member
         message = self.bot.cache.get_message(event.message_id)
 
-        if not guild or member.is_bot or member.id == 689154823941390507 or message.content.startswith(self.bot.cprefix):
+        if not guild or member.is_bot or member.id == 689154823941390507:
             return
 
         if not self.cd.update_cooldown(member, guild):
