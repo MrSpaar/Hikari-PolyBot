@@ -1,4 +1,4 @@
-from hikari import Member, Embed
+from hikari import Member, Embed, SelectMenuComponent
 from hikari.impl import ActionRowBuilder
 from hikari.events.interaction_events import InteractionCreateEvent
 from lightbulb import Context, Plugin, check, listener, guild_only
@@ -121,6 +121,9 @@ class Fun(Plugin):
     async def on_button_click(self, event):
         interaction = event.interaction
         button = interaction.message.components[0].components[0]
+
+        if isinstance(button, SelectMenuComponent):
+            return
 
         if button.label == 'Appuie dès que je change de couleur' and button.style == 4:
             embed = Embed(color=0xe74c3c, description='❌ Tu as appuyé trop tôt')
