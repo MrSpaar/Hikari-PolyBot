@@ -103,7 +103,7 @@ class Vocaux(Plugin):
             before = guild.get_channel(event.old_state.channel_id)
             entry = await self.bot.db.pending.find({'guild_id': guild.id, 'voc_id': before.id})
 
-            voice_states = filter(lambda vs: guild.get_channel(vs.channel_id)==before, guild.get_voice_states())
+            voice_states = filter(lambda vs: guild.get_channel(vs.channel_id)==before, guild.get_voice_states().values())
             count = len([vs.member for vs in voice_states])
 
             if entry and ((count == 1 and guild.get_my_member() in before.members) or not count):
