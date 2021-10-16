@@ -20,8 +20,8 @@ class Logs(Plugin):
     async def send_log(self, guild: GatewayGuild, embed: Embed):
         settings = await self.bot.db.setup.find({'_id': guild.id})
 
-        if logs := guild.get_channel(settings['logs']):
-            await logs.send(embed=embed)
+        if settings['logs'] and (channel := guild.get_channel(settings['logs'])):
+            await channel.send(embed=embed)        
 
         return settings
 
