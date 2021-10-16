@@ -38,7 +38,7 @@ class Logs(Plugin):
 
         if settings['new']:
             role = guild.get_role(settings['new'])
-            await member.add_roles(role)
+            await member.add_role(role)
 
     @listener(events.MemberDeleteEvent)
     async def on_member_remove(self, event):
