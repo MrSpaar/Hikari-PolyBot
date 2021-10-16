@@ -34,7 +34,7 @@ class Logs(Plugin):
 
         if settings['welcome']:
             channel = guild.get_channel(settings['welcome']['id'])
-            await channel.send(settings['welcome']['txt'])
+            await channel.send(settings['welcome']['txt'].replace('<mention>', member.mention))
 
         if settings['new']:
             role = guild.get_role(settings['new'])
