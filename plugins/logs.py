@@ -13,7 +13,7 @@ class Logs(Plugin):
         self.bot: Bot = bot
 
     async def get_audit_log(self, guild, event):
-        entries = await self.bot.rest.fetch_audit_log(guild, event_type=AuditLogEventType.MEMBER_UPDATE)
+        entries = await self.bot.rest.fetch_audit_log(guild, event_type=event)
         log_id = list(entries[0].entries.keys())[0]
         return entries[0].entries[log_id]
 
