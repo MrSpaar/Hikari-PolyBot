@@ -63,15 +63,18 @@ class Logs(Plugin):
         before, after = event.old_member, event.member
         embed = Embed(color=0x3498db)
 
-        entry = await self.get_audit_log(guild, AuditLogEventType.MEMBER_UPDATE)
-        member = guild.get_member(entry.user_id)
-
         if before.display_name != after.display_name:
+            entry = await self.get_audit_log(guild, AuditLogEventType.MEMBER_UPDATE)
+            member = guild.get_member(entry.user_id)
+
             if after == member:
                 embed.description = f"📝 {member.mention} a changé son surnom (`{before.display_name}` → `{after.display_name}`)"
             else:
                 embed.description = f"📝 {member.mention} a changé de surnom de {before.mention} (`{before.display_name}` → `{after.display_name}`)"
         elif (broles := before.get_roles()) != (aroles := after.get_roles()):
+            entry = await self.get_audit_log(guild, AuditLogEventType.ROLE_UPDATE)
+            member = guild.get_member(entry.user_id)
+
             new = list(filter(lambda r: r not in broles, aroles))
             removed = list(filter(lambda r: r not in aroles, broles))
             role, = new if new else removed
