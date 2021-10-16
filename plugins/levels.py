@@ -104,7 +104,6 @@ class Niveaux(Plugin):
     @listener(GuildMessageCreateEvent)
     async def on_message(self, event):
         guild, member = self.bot.cache.get_guild(event.guild_id), event.member
-        message = self.bot.cache.get_message(event.message_id)
 
         if not guild or member.is_bot or member.id == 689154823941390507:
             return
@@ -123,9 +122,9 @@ class Niveaux(Plugin):
                                          {'$inc': {'guilds.$.xp': randint(15, 25), 'guilds.$.level': 1 if xp >= next_lvl else 0}})
 
         if xp >= next_lvl:
-            settings = await self.bot.db.setup.find({'_id': message.guild.id})
+            settings = await self.bot.db.setup.find({'_id': guild.id})
             if channel := guild.get_channel(settings['channel']):
-                embed = Embed(description=f'🆙 {message.author.mention} vient de monter niveau **{lvl}**.', color=0xf1c40f)
+                embed = Embed(description=f'🆙 {event.message.author.mention} vient de monter niveau **{lvl}**.', color=0xf1c40f)
                 await channel.send(embed=embed)
 
 
