@@ -123,7 +123,7 @@ class Niveaux(Plugin):
 
         if xp >= next_lvl:
             settings = await self.bot.db.setup.find({'_id': guild.id})
-            if channel := guild.get_channel(settings['channel']):
+            if settings['channel'] and (channel := guild.get_channel(settings['channel'])):
                 embed = Embed(description=f'🆙 {event.message.author.mention} vient de monter niveau **{lvl}**.', color=0xf1c40f)
                 await channel.send(embed=embed)
 
