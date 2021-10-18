@@ -82,6 +82,29 @@ class Recherche(Plugin):
 
         await ctx.respond(embed=embed)
 
+    @command(brief='mc.hypixel.net', usage='<adresse IP>',
+             description='Afficher des informations sur un serveur')
+    async def minecraft(self, ctx: Context, *, ip):
+        resp = await get_json(f'https://api.mcsrvstat.us/2/{ip}')
+
+        if not resp['online']:
+            embed = Embed(color=0xe74c3c, description="❌ Le serveur n'est pas en ligne")
+            return await ctx.respond(embed=embed)
+
+        versions = ', '.join(resp['version']) if isinstance(resp['version'], list) else resp['version']
+        plugins = ', '.join([plugin['name'] for plugin in resp['plugins']]) if 'plugins' in resp else ''
+        mods = ', '.join(resp['mods']['names']) if 'mods' in resp else ''
+
+        description = f"🟢 Serveur en ligne, {resp['players']['online']} joueurs connectés\n" + \
+                      f"🔢 Versions supportées : {versions}\n" + \
+                      (f"🔌 Plugins du serveur : {plugins}" if plugins else '') + \
+                      (f"💾 Mods du serveur : {mods}" if mods else '')
+
+        embed = (Embed(color=0xfeca57, description=description)
+                 .set_author(name=f"{resp['hostname']} - {resp['ip']}", icon=resp['icon'] if 'icon' in resp else 'https://media.minecraftforum.net/attachments/300/619/636977108000120237.png'))
+
+        await ctx.respond(embed=embed)
+
     @command(aliases=['weather'], brief='Nancy', usage='<ville>',
              description="Donne la météo d'une ville sur un jour")
     async def meteo(self, ctx: Context, *, city: str):
