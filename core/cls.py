@@ -10,10 +10,9 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from logging import Logger, LogRecord, setLoggerClass
 
 class Bot(BaseBot):
-    def __init__(self, plugins=[], debug=False):
+    def __init__(self, debug=False):
         load_dotenv()
-        super().__init__(prefix='-' if debug else '!', insensitive_commands=True, intents=Intents.ALL,
-                         token=environ['DEBUG_TOKEN'] if debug else environ['BOT_TOKEN'])
+        super().__init__(prefix='-' if debug else '!', insensitive_commands=True, intents=Intents.ALL,token=environ['BOT_TOKEN'])
 
         setLoggerClass(LoggingHandler)
         self.remove_command('help')
