@@ -106,7 +106,7 @@ class Vocaux(Plugin):
             voice_states = filter(lambda vs: guild.get_channel(vs.channel_id)==before, guild.get_voice_states().values())
             count = len([vs.member for vs in voice_states])
 
-            if entry and ((count == 1 and guild.get_my_member() in before.members) or not count):
+            if entry and not count:
                 text = guild.get_channel(entry['txt_id'])
 
                 await text.delete()
