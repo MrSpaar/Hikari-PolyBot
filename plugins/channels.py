@@ -99,7 +99,8 @@ class Vocaux(Plugin):
                 except:
                     await channel.delete()
                     await text.delete()
-        elif event.old_state and event.old_state.channel_id:
+
+        if event.old_state and event.old_state.channel_id:
             before = guild.get_channel(event.old_state.channel_id)
             entry = await self.bot.db.pending.find({'guild_id': guild.id, 'voc_id': before.id})
 
