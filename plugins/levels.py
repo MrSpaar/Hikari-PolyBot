@@ -82,7 +82,7 @@ class Niveaux(Plugin):
             return
 
         message = self.bot.cache.get_message(event.message_id) 
-        if not message or not message.embeds or message.embeds[0].author.name != 'Classement du serveur':
+        if not message or not message.embeds or not message.embeds[0].author or message.embeds[0].author.name != 'Classement du serveur':
             return
 
         data = await self.bot.db.members.sort({'guilds.id':752921557214429316}, {'guilds.$': 1}, 'guilds.xp', -1)
@@ -105,7 +105,7 @@ class Niveaux(Plugin):
     async def on_message(self, event):
         guild, member = self.bot.cache.get_guild(event.guild_id), event.member
 
-        if not guild or member.is_bot or member.id == 689154823941390507:
+        if not guild or not member or member.is_bot or member.id == 689154823941390507:
             return
 
         if not self.cd.update_cooldown(member, guild):
