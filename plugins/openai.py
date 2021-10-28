@@ -15,10 +15,10 @@ class OpenAI(Plugin):
     @listener(MessageCreateEvent)
     async def on_message(self, event):
         message, channel = event.message, self.bot.cache.get_guild_channel(event.channel_id)
-        if not message or not message.content or '730832334055669930' not in message.content:
+        if not message or not message.content or not message.content[:22] in ['<@713781013830041640> ', '<@!713781013830041640>']:
             return
 
-        question = normalize_string(message.content.strip(self.bot.mention).strip())
+        question = normalize_string(message.content[22:].strip())
         query = f"Ce qui suit est une conversation avec un assistant IA. L'assistant est serviable, creatif, intelligent et tres sympathique.\\n\\n {question}"
         data = '{"prompt": "%s", "max_tokens": 100, "temperature": 0.1}' % query
 

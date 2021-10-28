@@ -1,6 +1,7 @@
 __pycache__
 .env
 .vscode
+lavalink
 club.py
 test.py
 polytech.py
