@@ -63,12 +63,15 @@ class Vocaux(Plugin):
         channel, text = guild.get_channel(entry['voc_id']), guild.get_channel(entry['txt_id'])
 
         if entries:
-            overwrites = [PermissionOverwrite(type=0, id=entry.id, allow=Permissions.VIEW_CHANNEL) for entry in entries] + \
-                         [PermissionOverwrite(type=0, id=guild.id, deny=Permissions.VIEW_CHANNEL)]
+            overwrites = [
+                PermissionOverwrite(type=0 if isinstance(entry, Role) else 1, id=entry.id, allow=Permissions.VIEW_CHANNEL) for entry in entries
+            ] + [
+                PermissionOverwrite(type=0, id=guild.id, deny=Permissions.VIEW_CHANNEL)
+            ]
         elif not entries and (parent := guild.get_channel(channel.parent_id)):
             overwrites = parent.permission_overwrites.values()
         elif not entries:
-            overwrites = PermissionOverwrite(type=0, id=guild.id, allow=Permissions.VIEW_CHANNEL)
+            overwrites = {guild.id : PermissionOverwrite(type=0, id=guild.id, allow=Permissions.VIEW_CHANNEL)}
 
         await text.edit(permission_overwrites=overwrites)
         await channel.edit(permission_overwrites=overwrites)
