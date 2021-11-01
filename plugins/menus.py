@@ -1,4 +1,4 @@
-from hikari import Role, Embed, Permissions, ComponentInteraction, MessageFlag
+from hikari import Role, Embed, Permissions, ComponentInteraction
 from hikari.events import InteractionCreateEvent
 from hikari.impl import ActionRowBuilder
 from lightbulb import Plugin, Context, Greedy, listener, check, guild_only, has_guild_permissions
@@ -76,17 +76,17 @@ class Menus(Plugin):
         if interaction.component_type == 2:
             role = guild.get_role(interaction.custom_id)
             await interaction.member.add_role(role)
-            return await interaction.create_initial_response(4, f'✅ Rôle {role.mention} ajouté', flags=MessageFlag.EPHEMERAL)
+            return await interaction.create_initial_response(4, f'✅ Rôle {role.mention} ajouté', flags=1 << 6)
 
         role = guild.get_role(int(interaction.values[0]))
         member_roles = interaction.member.get_roles()
         menu_roles = [guild.get_role(int(option.value)) for option in interaction.message.components[0].components[0].options]
 
         if any([role in member_roles for role in menu_roles]):
-            return await interaction.create_initial_response(4, f'❌ Tu as déjà un des rôles', flags=MessageFlag.EPHEMERAL)
+            return await interaction.create_initial_response(4, f'❌ Tu as déjà un des rôles', flags=1 << 6)
 
         await interaction.member.add_role(role)
-        await interaction.create_initial_response(4, f'✅ Rôle {role.mention} ajouté', flags=MessageFlag.EPHEMERAL)
+        await interaction.create_initial_response(4, f'✅ Rôle {role.mention} ajouté', flags=1 << 6)
 
 
 def load(bot):

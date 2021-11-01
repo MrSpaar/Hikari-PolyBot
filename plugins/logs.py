@@ -1,5 +1,6 @@
 from hikari import Embed, GatewayGuild, AuditLogEventType, events
 from hikari.events.channel_events import InviteCreateEvent
+from hikari.events.member_events import MemberDeleteEvent
 from lightbulb import Plugin, listener
 
 from core.cls import Bot
@@ -41,10 +42,11 @@ class Logs(Plugin):
             await member.add_role(role)
 
     @listener(events.MemberDeleteEvent)
-    async def on_member_remove(self, event):
+    async def on_member_remove(self, event: MemberDeleteEvent):
         guild, member = self.bot.cache.get_guild(event.guild_id), event.old_member
+        name = f'{member.display_name} ({member})' if member.display_name else str(member)
 
-        embed = Embed(color=0xe74c3c, description=f':outbox_tray: {member.display_name} ({member}) a quitté le serveur')
+        embed = Embed(color=0xe74c3c, description=f':outbox_tray: {name} a quitté le serveur')
         await self.send_log(guild, embed)
 
     @listener(events.BanDeleteEvent)
