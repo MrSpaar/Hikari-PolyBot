@@ -77,14 +77,12 @@ class Logs(Plugin):
             entry = await self.get_audit_log(guild, AuditLogEventType.MEMBER_ROLE_UPDATE)
             member = guild.get_member(entry.user_id)
 
-            new = list(filter(lambda r: r not in broles, aroles))
-            removed = list(filter(lambda r: r not in aroles, broles))
-            role, = new if new else removed
+            role, = set(broles).symmetric_difference(set(aroles))
 
             if after == member:
-                embed.description = f"📝 {member.mention} s'est {'ajouté' if new else 'retiré'} {role.mention}"
+                embed.description = f"📝 {member.mention} s'est {'ajouté' if role in aroles else 'retiré'} {role.mention}"
             else:
-                embed.description = f"📝 {member.mention} à {'ajouté' if new else 'retiré'} {role.mention} à {before.mention}"
+                embed.description = f"📝 {member.mention} à {'ajouté' if role in aroles else 'retiré'} {role.mention} à {before.mention}"
         else:
             return
 
