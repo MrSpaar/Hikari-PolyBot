@@ -23,7 +23,7 @@ PolyBot est **un bot discord multi-fonction**. Pour l'instant, il est **semi-pri
 |[Modération](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/moderation.py)| `mute` `unmute` `clear` `kick` `ban` `unban`                              |
 |[Infos](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/informations.py)   | `serverinfo` `userinfo` `roleinfo`                                        |
 |[Menus](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/utility.py)        | `menu boutons` `menu liste` `menu emojis`                                 |
-|[Setup](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/setup.py)          | `set` `settings`                                                          |
+|[Setup](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/setup.py)          | `set` `settings` `reload` `shutdown`                                      |
 
 # Modules supplémentaires
 
@@ -60,7 +60,6 @@ Ecrivez `!set logs <#channel>` pour définir le channel contenant les logs.
 |Membre unban              | Pseudo, par qui et raison                              |
 |Changement de surnom      | Ancien et nouveau surnom et par qui                    |
 |Ajout/Suppression de rôles| Rôle ajouté ou enlevé, de qui et par qui               |
-|Modification de profil    | Ancien et nouveau pseudo et/ou tag                     |
 |Création d'invitation     | Lien, autheur, date d'expiration, nombre d'utilisations|
 
 ### • ❌ [Gestion d'erreurs](https://github.com/MrSpaar/PolyBot/blob/master/modules/errors.py)
