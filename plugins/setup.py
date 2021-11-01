@@ -24,7 +24,7 @@ class Configuration(Plugin):
     @check(owner_only)
     @command(hidden=True)
     async def shutdown(self, ctx: Context):
-        embed = Embed(color=0xe74c3c, description='✅ Bot éteint')
+        embed = Embed(color=0xe74c3c, description='🔌 Bot éteint')
 
         await ctx.respond(embed=embed)
         await self.bot.close()
