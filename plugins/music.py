@@ -49,11 +49,14 @@ class Musique(Plugin):
 
     @listener(ShardReadyEvent)
     async def start_lavalink(self, _):
-        builder = (LavalinkBuilder(self.bot.get_me().id, self.bot._token)
-                   .set_host('127.0.0.1').set_password(''))
-        lava_client = await builder.build(EventHandler())
+        try:
+            builder = (LavalinkBuilder(self.bot.get_me().id, self.bot._token)
+                    .set_host('127.0.0.1').set_password(''))
+            lava_client = await builder.build(EventHandler())
 
-        self.bot.data.lavalink = lava_client
+            self.bot.data.lavalink = lava_client
+        except:
+            self.bot.remove_plugin('Musique')
 
     async def _stop(self, ctx):
         await self.bot.data.lavalink.destroy(ctx.guild_id)
