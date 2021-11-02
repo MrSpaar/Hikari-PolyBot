@@ -53,7 +53,7 @@ class Vocaux(Plugin):
     @check(guild_only)
     @voc.command(brief='@1A @2A', usage='<membres et/ou rôles>',
                  description='Rendre le channel privé')
-    async def private(self, ctx: Context, entries: Greedy[Union[Role, Member]] = None):
+    async def private(self, ctx: Context, *entries: Greedy[Union[Role, Member]]):
         guild = ctx.get_guild()
         channel = guild.get_channel(guild.get_voice_state(ctx.member).channel_id)
 
@@ -64,7 +64,7 @@ class Vocaux(Plugin):
 
         if entries:
             overwrites = [
-                PermissionOverwrite(type=0 if isinstance(entry, Role) else 1, id=entry.id, allow=Permissions.VIEW_CHANNEL) for entry in entries
+                PermissionOverwrite(type=0 if isinstance(entry, Role) else 1, id=entry[0].id, allow=Permissions.VIEW_CHANNEL) for entry in entries
             ] + [
                 PermissionOverwrite(type=0, id=guild.id, deny=Permissions.VIEW_CHANNEL)
             ]
