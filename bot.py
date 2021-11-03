@@ -8,6 +8,7 @@ bot = Bot(debug=False)
 
 @bot.listen(StartedEvent)
 async def set_status(_):
+    print('Bot is ready')
     await bot.update_presence(activity=Activity(type=0, name=f'{bot.cprefix}help'))
 
 sep = '/' if platform == 'linux' else '\\'
