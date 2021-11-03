@@ -50,10 +50,14 @@ class Informations(Plugin):
                   'idle': 'Absent',
                   'dnd': 'Ne pas déranger'}
 
-        presence = member.get_presence()
-        status = status[presence.visible_status]
+        if presence := member.get_presence():
+            status = status[presence.visible_status]
+            activities = [activities[activity.type].format(activity) for activity in presence.activities if activity.type in activities]
+        else:
+            status = 'Hors ligne'
+            activities = None
+
         flags = [flag.name.replace('_', ' ').title() for flag in member.flags]
-        activities = [activities[activity.type].format(activity) for activity in presence.activities if activity.type in activities]
 
         since = int(mktime(member.joined_at.timetuple()))
         creation = int(mktime(member.created_at.timetuple()))
