@@ -2,7 +2,6 @@ from hikari import Role, TextableChannel, Embed, Permissions
 from hikari.events import GuildAvailableEvent, GuildLeaveEvent, MemberCreateEvent, MemberDeleteEvent
 from lightbulb import Plugin, Context, listener, check, guild_only, owner_only, has_guild_permissions
 
-from glob import glob
 from typing import Union
 from core.cls import Bot
 from core.funcs import command
@@ -70,7 +69,7 @@ class Configuration(Plugin):
         guild = event.get_guild()
 
         try:
-            await self.bot.db.setup.insert({'_id': guild.id, 'mute': None, 'logs': None, 'channel': None, 'new': []})
+            await self.bot.db.setup.insert({'_id': guild.id, 'mute': None, 'logs': None, 'channel': None, 'new': None, 'welcome': None})
         except:
             return
         else:
