@@ -7,14 +7,12 @@ from dotenv import load_dotenv
 from lavasnek_rs import Lavalink
 from datetime import timedelta, datetime
 from motor.motor_asyncio import AsyncIOMotorClient
-from logging import Logger, LogRecord, setLoggerClass
 
 class Bot(BaseBot):
     def __init__(self, debug=False):
         load_dotenv()
-        super().__init__(prefix='-' if debug else '!', insensitive_commands=True, intents=Intents.ALL,token=environ['BOT_TOKEN'])
+        super().__init__(prefix='-' if debug else '!', insensitive_commands=True, intents=Intents.ALL,token=environ['BOT_TOKEN'], logs='ERROR')
 
-        setLoggerClass(LoggingHandler)
         self.remove_command('help')
 
         self.debug = debug
@@ -22,12 +20,6 @@ class Bot(BaseBot):
         self.db = Database()
         self.cprefix = '-' if debug else '!'
         self.owner_id = 201674460393242624
-
-
-class LoggingHandler(Logger):
-    def handle(self, record: LogRecord):
-        if record.levelname in ['CRITICAL', 'INFO', 'ERROR']:
-            print(record.getMessage())
 
 
 class Data:
@@ -136,8 +128,6 @@ class Collection:
             return data
         elif data:
             return data[0]
-
-        return
 
     async def update(self, query: dict, data: dict, upsert: bool = False) -> None:
         await self.collection.update_one(query, data, upsert)
