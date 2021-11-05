@@ -92,13 +92,23 @@ class Recherche(Plugin):
             return await ctx.respond(embed=embed)
 
         versions = ', '.join(resp['version']) if isinstance(resp['version'], list) else resp['version']
-        plugins = ', '.join([plugin['name'] for plugin in resp['plugins']]) if 'plugins' in resp else ''
-        mods = ', '.join(resp['mods']['names']) if 'mods' in resp else ''
 
-        description = f"🟢 Serveur en ligne, {resp['players']['online']} joueurs connectés\n" + \
-                      f"🔢 Versions supportées : {versions}\n" + \
-                      (f"🔌 Plugins du serveur : {plugins}" if plugins else '') + \
-                      (f"💾 Mods du serveur : {mods}" if mods else '')
+        description = f"🟢 Serveur en ligne\n" + \
+                      f"🔢 Versions supportées : {versions}\n"
+
+        if resp['players']['online']:
+            online = [f'`{player}`' for player in resp['players']['list']]
+            description += f"🙍 Joueurs connectés ({resp['players']['online']}) : {', '.join(online)}"
+        else:
+            description += '🙍 Joueurs connectés : aucun joueur en ligne'
+
+        if 'plugins' in resp:
+            plugins = ', '.join([f"`{plugin['name']}`" for plugin in resp['plugins']])
+            description += f'🔌 Plugins : {plugins}'
+
+        if 'mods' in resp:
+            mods = ', '.join(resp['mods']['names'])
+            description += f'💾 Mods : {mods}'
 
         embed = (Embed(color=0xfeca57, description=description)
                  .set_author(name=f"{resp['hostname']} - {resp['ip']}", icon=resp['icon'] if 'icon' in resp else 'https://media.minecraftforum.net/attachments/300/619/636977108000120237.png'))
