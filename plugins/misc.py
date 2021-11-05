@@ -14,12 +14,14 @@ class Divers(Plugin):
 
     @command(brief='utilitaire', usage='<argument>',
              description='Faire apparaître ce menu')
-    async def help(self, ctx: Context, arg: str = 'a', sub: str = 'a'):
+    async def help(self, ctx: Context, arg: str = None, sub: str = None):
         embed = Embed(color=0x3498db, title='Aide - ')
 
-        if command := self.bot.get_command(arg):
+        if (arg or sub) and (command := self.bot.get_command(arg)):
             if isinstance(command, Group) and sub:
                 sub = command.get_command(sub)
+
+            print(isinstance(command, Group))
 
             embed.title += command.name
             embed.description = f'{command.description}.' if not sub else sub.description
@@ -34,7 +36,7 @@ class Divers(Plugin):
             else:
                 embed.description += f'\n\n🙋 Utilisation : `{self.bot.cprefix}{command.name} {command.usage}`\n' + \
                                      f'👉 Exemple : `{self.bot.cprefix}{command.name} {command.brief}`'
-        elif plugin := self.bot.get_plugin(arg.title()):
+        elif arg and (plugin := self.bot.get_plugin(arg.title())):
             embed.title += plugin.name
             embed.description = '\n'.join([f'`{self.bot.cprefix}{command.name}` : {command.description}' for command in plugin.commands])
             embed.description += f'\n\nDétail : `{self.bot.cprefix}help commande`'
