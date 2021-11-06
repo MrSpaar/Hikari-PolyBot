@@ -23,7 +23,7 @@ PolyBot est **un bot discord multi-fonction**. Pour l'instant, il est **semi-pri
 |[Modération](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/moderation.py)| `mute` `unmute` `clear` `kick` `ban` `unban`                              |
 |[Infos](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/informations.py)   | `serverinfo` `userinfo` `roleinfo`                                        |
 |[Menus](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/utility.py)        | `menu boutons` `menu liste` `menu emojis`                                 |
-|[Setup](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/setup.py)          | `set` `settings` `reload` `shutdown`                                      |
+|[Setup](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/setup.py)          | `set` `settings`                                                          |
 
 # Modules supplémentaires
 
