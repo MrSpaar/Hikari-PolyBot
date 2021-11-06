@@ -12,22 +12,6 @@ class Configuration(Plugin):
         super().__init__(name=name)
         self.bot: Bot = bot
 
-    @check(owner_only)
-    @command(hidden=True)
-    async def reload(self, ctx: Context):
-        self.bot.reload_all_extensions()
-
-        embed = Embed(color=0x2ecc71, description='✅ Plugins relancés')
-        await ctx.respond(embed=embed)
-
-    @check(owner_only)
-    @command(hidden=True)
-    async def shutdown(self, ctx: Context):
-        embed = Embed(color=0xe74c3c, description='🔌 Bot éteint')
-
-        await ctx.respond(embed=embed)
-        await self.bot.close()
-
     @check(guild_only)
     @check(has_guild_permissions(Permissions.ADMINISTRATOR))
     @command(name='set', brief='channel #🧙-polybot',
