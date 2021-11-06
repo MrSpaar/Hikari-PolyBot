@@ -1,7 +1,7 @@
 from hikari import Embed
 from lightbulb import Plugin, Context
 
-from core.funcs import get_json, command
+from core.funcs import api_call, command
 from datetime import datetime, timedelta
 from yt_dlp import YoutubeDL
 import matplotlib.pyplot as plt
@@ -20,7 +20,7 @@ class Recherche(Plugin):
             'Authorization': f"Bearer {environ['TWITCH_TOKEN']}",
         }
 
-        resp = (await get_json(query, headers))['streams']
+        resp = (await api_call(query, headers))['streams']
         embed = (Embed(color=0x3498db)
                  .set_author(name=f"Twitch - {resp[0]['game']}", icon='https://i.imgur.com/gArdgyC.png'))
 
@@ -48,11 +48,11 @@ class Recherche(Plugin):
              description='Rechercher des articles wikipedia')
     async def wikipedia(self, ctx: Context, *, arg: str):
         query = f'https://fr.wikipedia.org/w/api.php?action=opensearch&search={arg}&namespace=0&limit=1'
-        resp = list(await get_json(query))
+        resp = list(await api_call(query))
         title, url = resp[1][0], resp[3][0]
 
         query = f'https://fr.wikipedia.org/w/api.php?format=json&action=query&prop=extracts|pageimages&exintro&explaintext&redirects=1&titles={title}'
-        resp = dict(await get_json(query))['query']['pages']
+        resp = dict(await api_call(query))['query']['pages']
         data = next(iter(resp.values()))
         desc = f"{data['extract']} [Lire l'article]({url})"
 
@@ -65,7 +65,7 @@ class Recherche(Plugin):
     @command(brief='Hunter x Hunter', usage="<nom de l'anime>",
              description='Rechercher des animes')
     async def anime(self, ctx: Context, *, name: str):
-        resp = (await get_json(f'https://kitsu.io/api/edge/anime?filter[text]={name}'))['data'][0]
+        resp = (await api_call(f'https://kitsu.io/api/edge/anime?filter[text]={name}'))['data'][0]
         anime = resp['attributes']
 
         end = datetime.strptime(anime['endDate'], '%Y-%m-%d').strftime('%d/%m/%Y') if anime['endDate'] else 'En cours'
@@ -82,44 +82,11 @@ class Recherche(Plugin):
 
         await ctx.respond(embed=embed)
 
-    @command(brief='mc.hypixel.net', usage='<adresse IP>',
-             description='Afficher des informations sur un serveur')
-    async def minecraft(self, ctx: Context, *, ip):
-        resp = await get_json(f'https://api.mcsrvstat.us/2/{ip}')
-
-        if not resp['online']:
-            embed = Embed(color=0xe74c3c, description="❌ Le serveur n'est pas en ligne")
-            return await ctx.respond(embed=embed)
-
-        versions = ', '.join(resp['version']) if isinstance(resp['version'], list) else resp['version']
-
-        description = f"🟢 Serveur en ligne\n" + \
-                      f"🔢 Versions supportées : {versions}\n"
-
-        if resp['players']['online']:
-            online = [f'`{player}`' for player in resp['players']['list']]
-            description += f"🙍 Joueurs connectés ({resp['players']['online']}) : {', '.join(online)}"
-        else:
-            description += '🙍 Joueurs connectés : aucun joueur en ligne'
-
-        if 'plugins' in resp:
-            plugins = ', '.join([f"`{plugin['name']}`" for plugin in resp['plugins']])
-            description += f'🔌 Plugins : {plugins}'
-
-        if 'mods' in resp:
-            mods = ', '.join(resp['mods']['names'])
-            description += f'💾 Mods : {mods}'
-
-        embed = (Embed(color=0xfeca57, description=description)
-                 .set_author(name=f"{resp['hostname']} - {resp['ip']}", icon=resp['icon'] if 'icon' in resp else 'https://media.minecraftforum.net/attachments/300/619/636977108000120237.png'))
-
-        await ctx.respond(embed=embed)
-
     @command(aliases=['weather'], brief='Nancy', usage='<ville>',
              description="Donne la météo d'une ville sur un jour")
     async def meteo(self, ctx: Context, *, city: str):
         query = f"https://api.openweathermap.org/data/2.5/forecast?q={city}&units=metric&APPID={environ['WEATHER_TOKEN']}"
-        resp = await get_json(query)
+        resp = await api_call(query)
         today, now = resp['list'][0], datetime.now()
         info = {'wind': f"{today['wind']['speed']} km/h",
                 'humidity': f"{today['main']['humidity']} %",

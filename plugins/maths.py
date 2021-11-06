@@ -1,7 +1,7 @@
 from lightbulb import Plugin, Context
 from hikari import Embed
 
-from core.funcs import get_json, command
+from core.funcs import api_call, command
 
 
 class Maths(Plugin):
@@ -9,7 +9,7 @@ class Maths(Plugin):
              description="Obtenir le résultat d'un calcul")
     async def calcul(self, ctx: Context, *, expr: str):
         query = expr.replace('+', '%2B').replace('x', '*')
-        result = await get_json(f"https://api.mathjs.org/v4/?expr={query}", json=False)
+        result = await api_call(f"https://api.mathjs.org/v4/?expr={query}", json=False)
 
         embed = Embed(color=0x3498db, description=f':pager: `{expr}` = `{result}`')
         await ctx.respond(embed=embed)
