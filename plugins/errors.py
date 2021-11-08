@@ -18,7 +18,6 @@ class Erreurs(Plugin):
             channel = guild.get_channel(event.message.channel_id)
 
             closest = gcm(event.message.content.split()[0][1:], [cmd.name for cmd in self.bot.commands])
-            print(closest)
             embed = Embed(color=0xe74c3c, description=f"❌ Commande inexistante{'' if not closest else ', peut-être voulais-tu utiliser `' + closest[0] + '` ?'}")
             return await channel.send(embed=embed)
 

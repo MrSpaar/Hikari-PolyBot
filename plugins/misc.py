@@ -21,8 +21,6 @@ class Divers(Plugin):
             if isinstance(command, Group) and sub:
                 sub = command.get_command(sub)
 
-            print(isinstance(command, Group))
-
             embed.title += command.name
             embed.description = f'{command.description}.' if not sub else sub.description
 
