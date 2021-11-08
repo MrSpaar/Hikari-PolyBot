@@ -43,6 +43,9 @@ class Logs(Plugin):
 
     @listener(events.MemberDeleteEvent)
     async def on_member_remove(self, event: MemberDeleteEvent):
+        if not event.old_member:
+            return
+
         guild, member = self.bot.cache.get_guild(event.guild_id), event.old_member
         name = f'{member.display_name} ({member})' if member.display_name else str(member)
 
