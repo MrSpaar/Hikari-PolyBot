@@ -66,6 +66,10 @@ class Logs(Plugin):
     async def on_member_update(self, event):
         guild = self.bot.cache.get_guild(event.guild_id)
         before, after = event.old_member, event.member
+
+        if not before or not after:
+            return
+
         embed = Embed(color=0x3498db)
 
         if before.display_name != after.display_name:
