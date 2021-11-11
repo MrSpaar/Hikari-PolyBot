@@ -18,7 +18,7 @@ async def update_queue(lavalink: Lavalink, guild_id: int, track: Track = None):
     embeds = message.embeds
 
     tracks = [t.track.info for t in node.queue[1:]] + ([track.info] if track else [])
-    queue = [f'{i+1}) [`{info.title}`]({info.uri}) de {info.author}' for i, info in enumerate(tracks)]
+    queue = [f'{i+1}) [`{info.title}`]({info.uri}) de `{info.author}`' for i, info in enumerate(tracks)]
 
     embeds[0].description = f'🎵 [`{np.track.info.title}`]({np.track.info.uri}) de `{np.track.info.author}`\n🙍 Demandé par <@{np.requester}>'
     embeds[1].description = '\n'.join(queue) or '*Pas de vidéos en attente*'
