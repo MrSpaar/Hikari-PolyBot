@@ -1,6 +1,4 @@
 from hikari import Embed, GatewayGuild, AuditLogEventType, events
-from hikari.events.channel_events import InviteCreateEvent
-from hikari.events.member_events import MemberDeleteEvent
 from lightbulb import Plugin, listener
 
 from core.cls import Bot
@@ -42,7 +40,7 @@ class Logs(Plugin):
             await member.add_role(role)
 
     @listener(events.MemberDeleteEvent)
-    async def on_member_remove(self, event: MemberDeleteEvent):
+    async def on_member_remove(self, event):
         if not event.old_member:
             return
 
@@ -52,14 +50,28 @@ class Logs(Plugin):
         embed = Embed(color=0xe74c3c, description=f':outbox_tray: {name} a quitté le serveur')
         await self.send_log(guild, embed)
 
+    @listener(events.BanCreateEvent)
+    async def on_member_ban(self, event: events.BanCreateEvent):
+        guild, target = self.bot.cache.get_guild(event.guild_id), event.user
+
+        try: entry = await self.get_audit_log(guild, AuditLogEventType.MEMBER_BAN_ADD)
+        except: return
+
+        reason, user = entry.reason, guild.get_member(entry.user_id)
+
+        embed = Embed(color=0xe74c3c, description=f"👨‍⚖️ {user.mention} a ban {target.mention}\n❔ Raison : {reason or 'Pas de raison'}")
+        await self.send_log(guild, embed)
+
     @listener(events.BanDeleteEvent)
     async def on_member_unban(self, event):
         guild, target = self.bot.cache.get_guild(event.guild_id), event.user
 
-        entry = await self.get_audit_log(guild, AuditLogEventType.MEMBER_BAN_REMOVE)
+        try: entry = await self.get_audit_log(guild, AuditLogEventType.MEMBER_BAN_REMOVE)
+        except : return
+
         reason, user = entry.reason, guild.get_member(entry.user_id)
 
-        embed = Embed(color=0xc27c0e, description=f"👨‍⚖️ {user.mention} a unban {target}\n❔ Raison : {reason or 'Pas de raison'}")
+        embed = Embed(color=0xc27c0e, description=f"👨‍⚖️ {user.mention} a unban {target.mention}\n❔ Raison : {reason or 'Pas de raison'}")
         await self.send_log(guild, embed)
 
     @listener(events.MemberUpdateEvent)
@@ -73,7 +85,9 @@ class Logs(Plugin):
         embed = Embed(color=0x3498db)
 
         if before.display_name != after.display_name:
-            entry = await self.get_audit_log(guild, AuditLogEventType.MEMBER_UPDATE)
+            try: entry = await self.get_audit_log(guild, AuditLogEventType.MEMBER_UPDATE)
+            except: return
+
             member = guild.get_member(entry.user_id)
 
             if after == member:
@@ -81,7 +95,9 @@ class Logs(Plugin):
             else:
                 embed.description = f"📝 {member.mention} a changé de surnom de {before.mention} (`{before.display_name}` → `{after.display_name}`)"
         elif (broles := before.get_roles()) != (aroles := after.get_roles()):
-            entry = await self.get_audit_log(guild, AuditLogEventType.MEMBER_ROLE_UPDATE)
+            try: entry = await self.get_audit_log(guild, AuditLogEventType.MEMBER_ROLE_UPDATE)
+            except: return
+
             member = guild.get_member(entry.user_id)
 
             role, = set(broles).symmetric_difference(set(aroles))
@@ -135,9 +151,12 @@ class Logs(Plugin):
 
     #     await self.send_log(message.guild, embed)
 
-    @listener(InviteCreateEvent)
+    @listener(events.InviteCreateEvent)
     async def on_invite_create(self, event):
         invite, guild = event.invite, self.bot.cache.get_guild(event.guild_id)
+
+        if not invite.inviter:
+            return
 
         url = f'https://discord.gg/{invite.code}'
         uses = f'{invite.max_uses} fois' if invite.max_uses else "à l'infini"
