@@ -1,6 +1,5 @@
-from hikari import Member, Embed, SelectMenuComponent
+from hikari import Member, Embed, SelectMenuComponent, InteractionCreateEvent
 from hikari.impl import ActionRowBuilder
-from hikari.events.interaction_events import InteractionCreateEvent
 from lightbulb import Context, Plugin, check, listener, guild_only
 
 from games.minesweeper import Minesweeper
