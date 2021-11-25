@@ -31,13 +31,12 @@ class OpenAI(Plugin):
             async with ClientSession() as s:
                 async with s.post('https://api.openai.com/v1/engines/davinci/completions', headers=headers, data=data) as resp:
                     data = await resp.json()
-                    try:
-                        msg = data['choices'][0]['text'].split('\n\n')[1].strip('—-')
-                        if "Ce qui suit est une conversation avec un assistant IA. L'assistant est serviable, creatif, intelligent et tres sympathique".lower() not in msg.lower():
-                            await message.respond(msg, reply=True)
-                        else:
-                            await message.respond("J'ai pas compris :(", reply=True)
-                    except:
+
+                    if 'error' in data:
+                        await message.respond("Quota atteinte, impossible de répondre au message",reply=True)
+                    elif 'choices' in data:
+                        await message.respond(data['choices'][0]['text'].split('\n\n')[1].strip('—-'), reply=True)
+                    else:
                         await message.respond("J'ai pas compris :(", reply=True)
 
 
