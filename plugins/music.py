@@ -13,6 +13,7 @@ async def update_queue(lavalink: Lavalink, guild_id: int, track: Track = None):
     np = node.now_playing
 
     if not np:
+        await Musique._stop(lavalink, guild_id)
         return await message.delete()
 
     embeds = message.embeds
@@ -58,12 +59,13 @@ class Musique(Plugin):
         except:
             self.bot.remove_plugin('Musique')
 
-    async def _stop(self, ctx):
-        await self.bot.data.lavalink.destroy(ctx.guild_id)
+    @staticmethod
+    async def _stop(lavalink, guild_id):
+        await lavalink.destroy(guild_id)
 
-        await self.bot.data.lavalink.leave(ctx.guild_id)
-        await self.bot.data.lavalink.remove_guild_node(ctx.guild_id)
-        await self.bot.data.lavalink.remove_guild_from_loops(ctx.guild_id)
+        await lavalink.leave(guild_id)
+        await lavalink.remove_guild_node(guild_id)
+        await lavalink.remove_guild_from_loops(guild_id)
 
     async def _join(self, ctx):
         states = self.bot.cache.get_voice_states_view_for_guild(ctx.get_guild())
@@ -113,7 +115,7 @@ class Musique(Plugin):
     @command()
     async def stop(self, ctx: Context):
         await ctx.message.delete()
-        await self._stop(ctx)
+        await self._stop(self.bot.data.lavalink, ctx.guild_id)
 
     @check(guild_only)
     @command(description='Passer la vidéo en cours de lecture')
@@ -126,7 +128,7 @@ class Musique(Plugin):
             return await ctx.respond(embed=embed)
 
         if not node.queue and not node.now_playing:
-            await self._stop(ctx)
+            await self._stop(self.bot.data.lavalink, ctx.guild_id)
 
         await ctx.message.delete()
 
