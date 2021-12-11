@@ -27,7 +27,8 @@ class Fun(Plugin):
 
     @command(aliases=['minesweeper'], description='Jouer au démineur (!regles demineur)')
     async def demineur(self, ctx: Context):
-        await Minesweeper(ctx).start()
+        await ctx.respond('Commande en cours de développement')
+        # await Minesweeper(ctx).start()
 
     @command(brief='echecs', usage='<echecs ou demineur>',
              description='Afficher une aide pour jouer aux échecs ou au démineur')
