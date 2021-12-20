@@ -111,45 +111,43 @@ class Logs(Plugin):
 
         await self.send_log(guild, embed)
 
-    # events.GuildMessageDeleteEvent.old_message will be added in the next hikari release
-    # and messages are removed from the cache when they're deleted
-    # so the bot can't log deleted messages yet
+    @listener(events.GuildMessageDeleteEvent)
+    async def on_message_delete(self, event):
+        guild = event.get_guild()
+        if not guild:
+            return
 
-    # @listener(events.GuildMessageDeleteEvent)
-    # async def on_message_delete(self, event):
-    #     guild = event.get_guild()
-    #     if not guild:
-    #         return
+        channel = event.get_channel()
+        message = event.old_message
 
-    #     channel = event.get_channel()
-    #     message = event.old_message
+        if message.author.is_bot or 'test' in channel.name or (message.content and len(message.content) == 1):
+            return
 
-    #     if message.author.is_bot or 'test' in channel.name or len(message.content) == 1 or \
-    #        (len(message.content) in [5, 6, 7] and message.content.count(',') == 2):
-    #         return
+        date = message.timestamp.replace(tzinfo=None)
+        mentions = tuple(message.mentions.users.keys()) + message.mentions.role_ids
 
-    #     flags = [
-    #         (now(utc=True)-message.timestamp).total_seconds() <= 20 and message.mentions and message.content,
-    #         message.content and not message.attachments,
-    #         message.content or message.attachments
-    #     ]
+        flags = [
+            (now(utc=True)-date).total_seconds() <= 20 and mentions and message.content,
+            message.content and not message.attachments,
+            message.content or message.attachments
+        ]
 
-    #     infos = [
-    #         {'emoji': '<:ping:768097026402942976>', 'color': 0xe74c3c},
-    #         {'emoji': '🗑️', 'color': 0x979c9f},
-    #         {'emoji': '🗑️', 'color': 0xf1c40f}
-    #     ]
+        infos = [
+            {'emoji': '<:ping:768097026402942976>', 'color': 0xe74c3c},
+            {'emoji': '🗑️', 'color': 0x979c9f},
+            {'emoji': '🗑️', 'color': 0xf1c40f}
+        ]
 
-    #     entry = [infos[i] for i, flag in enumerate(flags) if flag][0]
+        entry = [infos[i] for i, flag in enumerate(flags) if flag][0]
 
-    #     embed = Embed(color=entry['color'], description=f'{entry["emoji"]} Message de {message.author.mention} supprimé dans {channel.mention}:')
+        embed = Embed(color=entry['color'], description=f'{entry["emoji"]} Message de {message.author.mention} supprimé dans {channel.mention}:')
 
-    #     if message.content:
-    #         embed.description += f'\n\n> {message.content}'
-    #     if message.attachments:
-    #         embed.set_image(url=message.attachments[0].url)
+        if message.content:
+            embed.description += f'\n\n> {message.content}'
+        if message.attachments:
+            embed.set_image(message.attachments[0].url)
 
-    #     await self.send_log(message.guild, embed)
+        await self.send_log(guild, embed)
 
     @listener(events.InviteCreateEvent)
     async def on_invite_create(self, event):
