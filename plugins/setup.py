@@ -1,6 +1,6 @@
 from hikari import Role, TextableChannel, Embed, Permissions
-from hikari.events import GuildAvailableEvent, GuildLeaveEvent, MemberCreateEvent, MemberDeleteEvent
-from lightbulb import Plugin, Context, listener, check, guild_only, owner_only, has_guild_permissions
+from hikari.events import GuildJoinEvent, GuildLeaveEvent, MemberCreateEvent, MemberDeleteEvent
+from lightbulb import Plugin, Context, listener, check, guild_only, has_guild_permissions
 
 from typing import Union
 from core.cls import Bot
@@ -48,17 +48,13 @@ class Configuration(Plugin):
         embed = Embed(color=0x3498db, description=f"💬 Bot : {channel}\n📟 Logs : {logs}\n🔇 Mute : {mute}")
         await ctx.respond(embed=embed)
 
-    @listener(GuildAvailableEvent)
+    @listener(GuildJoinEvent)
     async def on_guild_join(self, event):
         guild = event.get_guild()
 
-        try:
-            await self.bot.db.setup.insert({'_id': guild.id, 'mute': None, 'logs': None, 'channel': None, 'new': None, 'welcome': None})
-        except:
-            return
-        else:
-            for member in filter(lambda m: not m.bot, guild.members):
-                await self.bot.db.members.update({'_id': member.id}, {'$addToSet': {'guilds': {'id': guild.id, 'level': 0, 'xp':0}}}, True)
+        await self.bot.db.setup.insert({'_id': guild.id, 'mute': None, 'logs': None, 'channel': None, 'new': None, 'welcome': None})
+        for member in filter(lambda m: not m.bot, guild.members):
+            await self.bot.db.members.update({'_id': member.id}, {'$addToSet': {'guilds': {'id': guild.id, 'level': 0, 'xp':0}}}, True)
 
     @listener(GuildLeaveEvent)
     async def on_guild_remove(self, event):
