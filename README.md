@@ -53,6 +53,7 @@ Ecrivez `!set logs <#channel>` pour définir le channel contenant les logs.
 |Membre unban              | Pseudo, par qui et raison                              |
 |Changement de surnom      | Ancien et nouveau surnom et par qui                    |
 |Ajout/Suppression de rôles| Rôle ajouté ou enlevé, de qui et par qui               |
+|Message supprimé          | Contenu du message, images, auteur et salon            |
 |Création d'invitation     | Lien, autheur, date d'expiration, nombre d'utilisations|
 
 ### • ❌ [Gestion d'erreurs](https://github.com/MrSpaar/PolyBot/blob/master/modules/errors.py)
