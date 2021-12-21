@@ -1,11 +1,9 @@
-from hikari import Member, Embed, Permissions, GatewayGuild, StartedEvent
-from lightbulb import Plugin, Context, check, guild_only, has_guild_permissions, listener
+from hikari import Member, Embed, Permissions, GatewayGuild
+from lightbulb import Plugin, Context, check, guild_only, has_guild_permissions
 
-from core.funcs import is_higher, now
-from datetime import timedelta
+from core.funcs import is_higher
 from core.funcs import command
 from core.cls import Bot
-from asyncio import sleep
 
 
 class Moderation(Plugin):
@@ -19,82 +17,6 @@ class Moderation(Plugin):
         logs = guild.get_channel(settings['logs'])
 
         return role, logs
-
-    @listener(StartedEvent)
-    async def unmute_loop(self, event):
-        if self.bot.debug:
-            return
-
-        while True:
-            await sleep(60)
-
-            entries = await self.bot.db.pending.find({'end': {'$lt': now()}})
-            if not entries:
-                continue
-
-            entries = entries if isinstance(entries, list) else [entries]
-            for entry in entries:
-                guild = self.bot.cache.get_guild(entry['guild_id'])
-                settings = await self.bot.db.setup.find({'_id': entry['guild_id']})
-
-                member = guild.get_member(entry['id'])
-                role = guild.get_role(settings['mute'])
-
-                await member.remove_role(role)
-                await self.bot.db.pending.delete(entry)
-
-    @check(guild_only)
-    @check(is_higher)
-    @check(has_guild_permissions(Permissions.MANAGE_MESSAGES))
-    @command(brief='@Antoine Grégoire 10m mdrr', usage='<membre> <durée> <raison (optionnel)>',
-             description='Rendre un membre muet')
-    async def mute(self, ctx: Context, member: Member, time: str = None):
-        guild = ctx.get_guild()
-        role, _ = await self.fetch_settings(guild)
-
-        if not role:
-            embed = Embed(color=0xe74c3c, description=f'❌ Aucun rôle mute spécifié (`!set mute @role`)')
-            return await ctx.respond(embed=embed)
-
-        if role in member.get_roles():
-            embed = Embed(color=0xe74c3c, description=f'❌ {member.mention} est déjà mute')
-            return await ctx.send(embed=embed)
-
-        try:
-            units = {"s": [1, 'secondes'], "m": [60, 'minutes'], "h": [3600, 'heures']}
-            date = now() + timedelta(seconds=(int(time[:-1])*units[time[-1]][0]))
-            time = f"{time[:-1]} {units[time[-1]][1]}"
-        except:
-            date = now() + timedelta(days=1000)
-            time = 'indéfiniment'
-
-        try:
-            embed = Embed(color=0x2ecc71, description=f'✅ {member.mention} a été mute {time}')
-
-            await member.add_role(role)
-            await self.bot.db.pending.insert({'guild_id': guild.id, 'id': member.id, 'end': date})
-        except:
-            embed = Embed(color=0xe74c3c, description='❌ La cible a plus de permissions que moi')
-
-        await ctx.respond(embed=embed)
-
-    @check(guild_only)
-    @check(is_higher)
-    @check(has_guild_permissions(Permissions.MANAGE_MESSAGES))
-    @command(brief='@Antoine Grégoire', usage='<membre>',
-             description='Redonner la parole à un membre')
-    async def unmute(self, ctx: Context, member: Member):
-        guild = ctx.get_guild()
-        role, _ = await self.fetch_settings(guild)
-
-        if role not in member.get_roles():
-            return await ctx.send(f"❌ {member.mention} n'est pas mute")
-
-        await member.remove_role(role)
-        await self.bot.db.pending.delete({'guild_id': guild.id, 'id': member.id})
-
-        embed = Embed(color=0x2ecc71, description=f'✅ {member.mention} a été unmute')
-        await ctx.respond(embed=embed)
 
     @check(guild_only)
     @check(has_guild_permissions(Permissions.MANAGE_MESSAGES))
