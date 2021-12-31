@@ -16,8 +16,8 @@ class Vocaux(Plugin):
     @group(brief='owner @Alexandre Humber', usage='<sous commande> <sous arguments>',
            description='Commandes liées aux channels temporaires')
     async def voc(self, ctx: Context):
-        if ctx.invoked_with.lower() not in ['rename', 'owner', 'private']:
-            embed = Embed(color=0xe74c3c, description='❌ Sous commande inconnue : `rename` `owner` `private`')
+        if ctx.invoked_with.lower() not in (sub := ['rename', 'owner', 'private']):
+            embed = Embed(color=0xe74c3c, description=f"❌ Sous commande inconnue : {' '.join([f'`{cmd}`' for cmd in sub])}")
             await ctx.respond(embed=embed)
 
     @check(vc_check)
