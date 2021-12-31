@@ -132,6 +132,3 @@ class Fun(Plugin):
 
 def load(bot):
     bot.add_plugin(Fun())
-
-def unload(bot):
-    bot.remove_plugin('Fun')

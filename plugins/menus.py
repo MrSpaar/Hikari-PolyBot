@@ -91,6 +91,3 @@ class Menus(Plugin):
 
 def load(bot):
     bot.add_plugin(Menus(bot))
-
-def unload(bot):
-    bot.remove_plugin('Menus')

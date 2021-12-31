@@ -51,6 +51,3 @@ class Maths(Plugin):
 
 def load(bot):
     bot.add_plugin(Maths())
-
-def unload(bot):
-    bot.remove_plugin('Maths')

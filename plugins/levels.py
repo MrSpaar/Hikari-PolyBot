@@ -130,6 +130,3 @@ class Niveaux(Plugin):
 
 def load(bot):
     bot.add_plugin(Niveaux(bot))
-
-def unload(bot):
-    bot.add_plugin('Niveaux')

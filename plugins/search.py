@@ -138,6 +138,3 @@ class Recherche(Plugin):
 
 def load(bot):
     bot.add_plugin(Recherche())
-
-def unload(bot):
-    bot.remove_plugin('Recherche')

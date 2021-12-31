@@ -166,6 +166,3 @@ class Logs(Plugin):
 
 def load(bot):
     bot.add_plugin(Logs(bot))
-
-def unload(bot):
-    bot.remove_plugin('Logs')

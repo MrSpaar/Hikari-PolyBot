@@ -78,6 +78,3 @@ class Configuration(Plugin):
 
 def load(bot):
     bot.add_plugin(Configuration(bot))
-
-def unload(bot):
-    bot.remove_plugin('Configuration')

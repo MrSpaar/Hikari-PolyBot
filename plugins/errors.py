@@ -75,6 +75,3 @@ class Erreurs(Plugin):
 
 def load(bot):
     bot.add_plugin(Erreurs(bot))
-
-def unload(bot):
-    bot.remove_plugin('Erreurs')

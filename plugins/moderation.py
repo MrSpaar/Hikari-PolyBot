@@ -74,6 +74,3 @@ class Moderation(Plugin):
 
 def load(bot):
     bot.add_plugin(Moderation(bot))
-
-def unload(bot):
-    bot.remove_plugin('Moderation')

@@ -147,7 +147,3 @@ class Musique(Plugin):
 
 def load(bot):
     bot.add_plugin(Musique(bot))
-
-
-def unload(bot):
-    bot.remove_plugin("Musique")

@@ -93,6 +93,3 @@ class Divers(Plugin):
 
 def load(bot):
     bot.add_plugin(Divers(bot))
-
-def unload(bot):
-    bot.remove_plugin('Divers')

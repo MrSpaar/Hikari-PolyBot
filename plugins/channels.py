@@ -120,6 +120,3 @@ class Vocaux(Plugin):
 
 def load(bot):
     bot.add_plugin(Vocaux(bot))
-
-def unload(bot):
-    bot.remove_plugin('Vocaux')

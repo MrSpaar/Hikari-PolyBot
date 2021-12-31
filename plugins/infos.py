@@ -136,6 +136,3 @@ class Informations(Plugin):
 
 def load(bot):
     bot.add_plugin(Informations())
-
-def unload(bot):
-    bot.remove_plugin('Informations')
