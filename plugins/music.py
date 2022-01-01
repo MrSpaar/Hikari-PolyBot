@@ -15,10 +15,8 @@ async def update_queue(lavalink: Lavalink, guild_id: int, track: Track = None):
     if not np:
         await Musique._stop(lavalink, guild_id)
 
-        try:
-            await message.delete()
-        except:
-            pass
+        try: await message.delete()
+        except: pass
 
         return
 
@@ -47,7 +45,7 @@ class EventHandler:
             await event.message.respond(embed=embed)
         else:
             if not node.queue and not node.now_playing:
-                await lavalink.stop(event.guild_id)
+                await Musique._stop(event.guild_id)
 
 class Musique(Plugin):
     def __init__(self, bot):
