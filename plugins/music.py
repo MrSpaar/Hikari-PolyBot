@@ -14,7 +14,13 @@ async def update_queue(lavalink: Lavalink, guild_id: int, track: Track = None):
 
     if not np:
         await Musique._stop(lavalink, guild_id)
-        return await message.delete()
+
+        try:
+            await message.delete()
+        except:
+            pass
+
+        return
 
     embeds = message.embeds
 
