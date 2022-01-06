@@ -1,5 +1,5 @@
 hikari
-hikari-lightblub
+hikari-lightbulb
 lavasnek_rs
 
 python-dotenv

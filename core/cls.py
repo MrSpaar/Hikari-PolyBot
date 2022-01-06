@@ -1,5 +1,5 @@
-from hikari import Intents, Member, GatewayBot
-from lightbulb import Bot as BaseBot, Command as BaseCommand, Group as BaseGroup
+from hikari import Intents, Member, GatewayBot, Color
+from lightbulb import BotApp
 
 from os import environ
 from typing import Union
@@ -8,17 +8,16 @@ from lavasnek_rs import Lavalink
 from datetime import timedelta, datetime
 from motor.motor_asyncio import AsyncIOMotorClient
 
-class Bot(BaseBot):
-    def __init__(self, debug=False):
+
+class Bot(BotApp):
+    def __init__(self):
         load_dotenv()
-        super().__init__(prefix='-' if debug else '!', insensitive_commands=True, intents=Intents.ALL,token=environ['BOT_TOKEN'], logs='ERROR')
+        guilds = (752921557214429316, 634339847108165632, 339045627478540288)
 
-        self.remove_command('help')
+        super().__init__(intents=Intents.ALL,token=environ['BOT_TOKEN'], logs='ERROR', default_enabled_guilds=guilds)
 
-        self.debug = debug
         self.data = Data()
         self.db = Database()
-        self.cprefix = '-' if debug else '!'
         self.owner_id = 201674460393242624
 
 
@@ -26,44 +25,6 @@ class Data:
     def __init__(self) -> None:
         self.lavalink: Lavalink = None
 
-class Command(BaseCommand):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args)
-
-        self.brief = kwargs.get('brief', '')
-        self.usage = kwargs.get('usage', '')
-        self.description = kwargs.get('description', '')
-
-
-class Group(BaseGroup):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args)
-
-        self.brief = kwargs.get('brief', '')
-        self.usage = kwargs.get('usage', '')
-        self.description = kwargs.get('description', '')
-
-    def command(self, **kwargs):
-        def decorate(func):
-            name = kwargs.get('name', func.__name__)
-            self._subcommands[name] = Command(
-                func,
-                kwargs.get('name', func.__name__),
-                kwargs.get('allow_extra_arguments', True),
-                kwargs.get('aliases', []),
-                kwargs.get('hidden', False),
-                parent=self,
-                **kwargs
-            )
-
-            if self.inherit_checks:
-                self._subcommands[name]._checks.extend(self._checks)
-            self.subcommands.add(self._subcommands[name])
-            for alias in kwargs.get("aliases", []):
-                self._subcommands[alias] = self._subcommands[name]
-            return self._subcommands[name]
-
-        return decorate
 
 class Cooldown:
     def __init__(self, usages: int, seconds: int):

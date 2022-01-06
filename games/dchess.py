@@ -11,15 +11,15 @@ from os import remove
 
 
 class Chess:
-    def __init__(self, ctx, opponent):
+    def __init__(self, ctx: Context):
         self.bot: Bot = ctx.bot
         self.ctx: Context = ctx
         self.message: Message = None
 
         self.end = False
         self.board = Board()
-        self.opponent: Member = opponent
-        self.cur = [ctx.member, opponent]
+        self.opponent: Member = ctx.options.membre
+        self.cur = [ctx.member, ctx.options.membre]
 
     async def start(self) -> None:
         await self.send_message(init=True)
