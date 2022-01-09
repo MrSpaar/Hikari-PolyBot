@@ -1,7 +1,6 @@
-from hikari import Embed, GatewayGuild, AuditLogEventType, events
+from hikari import Embed, GatewayGuild, AuditLogEventType, Attachment, events
 from lightbulb import Plugin
 
-from core.cls import Bot
 from core.funcs import now
 from time import mktime
 
@@ -14,12 +13,12 @@ async def get_audit_log(guild, event):
     return entries[0].entries[log_id]
 
 
-async def send_log(guild: GatewayGuild, embed: Embed):
+async def send_log(guild: GatewayGuild, embeds: list[Embed], attachments: list[Attachment] = None) -> dict:
     settings = await plugin.bot.db.setup.find({"_id": guild.id})
     channel = guild.get_channel(settings["logs"])
 
     if channel:
-        await channel.send(embed=embed)
+        await channel.send(embeds=embeds, attachments=attachments)
 
     return settings
 
