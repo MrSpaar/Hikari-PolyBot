@@ -6,14 +6,12 @@ from asyncio import TimeoutError
 from chess import Board, Move
 from chess.svg import board
 from cairosvg import svg2png
-from core.cls import Bot
-from os import remove
 
 
 class Chess:
     def __init__(self, ctx: Context):
-        self.bot: Bot = ctx.bot
         self.ctx: Context = ctx
+        self.channel = ctx.get_channel()
         self.message: Message = None
 
         self.end = False
@@ -21,16 +19,18 @@ class Chess:
         self.opponent: Member = ctx.options.membre
         self.cur = [ctx.member, ctx.options.membre]
 
+
     async def start(self) -> None:
         await self.send_message(init=True)
         await self.message.add_reaction('✅')
         await self.message.add_reaction('❌')
 
         try:
-            event = await self.bot.wait_for(GuildReactionAddEvent, timeout=300,
-                                            predicate=lambda e: (e.emoji_name == '✅' or e.emoji_name == '❌') and e.member == self.opponent)
+            event = await self.ctx.bot.wait_for(GuildReactionAddEvent, timeout=300,
+                                            predicate=lambda e: e.emoji_name in ['✅', '❌'] and e.member.id == self.opponent.id)
         except:
             return await self.send_message(color=0xe74c3c, text="❌ L'adversaire n'a pas accepté la partie à temps")
+
 
         if str(event.emoji_name) == '❌':
             return await self.send_message(color=0xe74c3c, text="❌ L'adversaire à refusé la partie")
@@ -38,26 +38,29 @@ class Chess:
         await self.send_message(color=0xfffff)
         return await self.play()
 
+
     async def send_message(self, move: Move = None, color=0x00000, text: str = '', init: bool = False) -> None:
         if self.message:
             await self.message.delete()
 
-        b = board(self.board, lastmove=move) if move else board(self.board)
-        svg2png(bytestring=b, write_to='output.png')
+        board_bytes = board(self.board, lastmove=move) if move else board(self.board)
+        board_bytes = svg2png(bytestring=board_bytes, write_to=None)
+
+
         footer = '2 minutes par coups' + f' • Tour de {self.cur[1].display_name}' if not init else ''
 
         embed = (Embed(color=color, description=text)
                  .set_footer(text=footer)
-                 .set_image('output.png')
+                 .set_image(board_bytes)
                  .set_author(name=f'{self.opponent.username} contre {self.ctx.author.username}',
                              icon=self.opponent.avatar_url))
 
-        self.message = await self.ctx.respond(embed=embed)
-        remove('output.png')
+        self.message = await self.channel.send(embed=embed)
+
 
     async def play(self) -> None:
         try:
-            event = await self.bot.wait_for(GuildMessageCreateEvent, timeout=120, predicate=lambda m: m.author == self.cur[0])
+            event = await self.ctx.bot.wait_for(GuildMessageCreateEvent, timeout=120, predicate=lambda m: m.author.id == self.cur[0].id)
 
             if event.message.content in ['ff', 'resign', 'abandon', 'abandonner', 'quit']:
                 return await self.ctx.respond(f'{self.cur[0].mention} a abandonné la partie')

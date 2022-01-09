@@ -1,6 +1,7 @@
-from hikari import Role, Permissions, InteractionCreateEvent, ComponentInteraction
+from hikari import Permissions, InteractionCreateEvent, GuildMessageCreateEvent
 from hikari.impl import ActionRowBuilder
 from lightbulb import (
+    RoleConverter,
     Plugin,
     Context,
     SlashCommand,
@@ -12,65 +13,77 @@ from lightbulb import (
     has_guild_permissions,
 )
 
-from typing import Union
-
 plugin = Plugin("Menus")
 plugin.add_checks(guild_only | has_guild_permissions(Permissions.MANAGE_ROLES))
 
 
-@plugin.command()
-@option("roles", "Les rôles du menu", Role, modifier=OptionModifier.GREEDY)
-@option("titre", "Le titre du menu de rôles (ex. /boutons @role1 @role2 Incroyable menu)", modifier=OptionModifier.CONSUME_REST)
-@command("boutons", "Créer un menu de rôles avec des boutons")
-@implements(SlashCommand)
-async def boutons(ctx: Context):
-    components = []
-
-    for i in range(0, len(ctx.options.roles), 5):
-        component = ActionRowBuilder()
-        for role in ctx.options.roles[i : i + 5]:
-            component.add_button(3, role.id).set_label(role.name).add_to_container()
-
-        components += [component]
-    await ctx.respond(f"Menu de rôles - {ctx.options.titre}", components=components)
-
-
-@plugin.command()
-@option("paires", "Les paires emoji/role du menu", Union[Role, str], modifier=OptionModifier.GREEDY,)
-@command("emojis", "Faire un menu de rôles avec des boutons incluant des emojis (ex. /emoji 🥫 @role1 🎮 @role2",)
-@implements(SlashCommand)
-async def emojis(ctx: Context):
-    components = []
-
-    for i in range(0, len(ctx.options.paires), 10):
-        component = ActionRowBuilder()
-        for emoji, role in zip(ctx.options.paires[i:i+10:2], ctx.options.paires[i+1:i+10:2]):
-            component.add_button(3, role.id).set_label(role.name).set_emoji(emoji).add_to_container()
-
-        components += [component]
-    await ctx.respond(f"Menu de rôles", components=components)
-
-
-@plugin.command()
-@option("roles", "Les rôles du menu", Role, modifier=OptionModifier.GREEDY)
-@option("titre", "Le titre du menu", modifier=OptionModifier.CONSUME_REST)
-@command("liste", "Faire un menu de rôles avec une liste déroulante")
-@implements(SlashCommand)
-async def liste(ctx: Context):
+def build_menu(custom_id: str, labels: list[str], ids: list, emojis: list[str] = None, select: bool = False) -> ActionRowBuilder:
     component = ActionRowBuilder()
-    select = component.add_select_menu("menu")
 
-    for role in ctx.options.roles:
-        select.add_option(role.name, role.id).add_to_menu()
+    if select:
+        select = component.add_select_menu(custom_id)
 
-    select.set_placeholder(ctx.options.titre)
-    select.add_to_container()
-    await ctx.respond("Menu de rôles", component=component)
+        for label, id in zip(labels, ids):
+            select.add_option(label, id).add_to_menu()
 
+        select.add_to_container()
+    else:
+        if emojis:
+            for i in range(len(labels)):
+                component.add_button(3, ids[i]).set_emoji(emojis[i]).set_label(labels[i]).add_to_container()
+        else:
+            for i in range(len(labels)):
+                component.add_button(3, ids[i]).set_label(labels[i]).add_to_container()
+
+    return component
+
+
+async def fetch_roles(ctx: Context, string: str):
+    for char in "<@&>":
+        string = string.replace(char, "")
+
+    converter = RoleConverter(ctx)
+    role_ids = string.split()
+
+    for role_id in role_ids:
+        yield await converter.convert(role_id)
+
+
+@plugin.command()
+@option("titre", "Le titre du menu de rôles", modifier=OptionModifier.CONSUME_REST)
+@command("menu", "Créer un menu de rôles")
+@implements(SlashCommand)
+async def menu(ctx: Context):
+    component = build_menu("setup", ('Boutons', 'Liste', 'Emojis'), ('button', 'select', 'emoji'), select=True)
+    resp = await ctx.respond("Choisis le type de menu :", component=component)
+    message = await resp.message()
+
+    type_event = await plugin.bot.wait_for(InteractionCreateEvent, None, lambda e: e.interaction.member == ctx.member)
+    await type_event.interaction.create_initial_response(7, "Entre les rôles du menu : ", components=[])
+
+    roles_event = await plugin.bot.wait_for(GuildMessageCreateEvent, None, lambda m: m.author == ctx.user)
+    await roles_event.message.delete()
+
+    menu_type = type_event.interaction.values[0]
+    labels, ids = zip(*[(role.name, role.id) async for role in fetch_roles(ctx, roles_event.message.content)])
+
+    if menu_type == "emoji":
+        await message.edit('Entre les emojis : ')
+        emojis_event = await plugin.bot.wait_for(GuildMessageCreateEvent, None, lambda m: m.author == ctx.user)
+        await emojis_event.message.delete()
+
+        emojis = emojis_event.message.content.split()
+        component = build_menu('menu', labels, ids, emojis)
+    elif menu_type == 'select':
+        component = build_menu('menu', labels, ids, select=True)
+    else:
+        component = build_menu('menu', labels, ids)
+
+    await message.edit(f'Menu de rôles - {ctx.options.titre}', component=component)
 
 @plugin.listener(InteractionCreateEvent)
 async def on_button_click(event):
-    interaction: ComponentInteraction = event.interaction
+    interaction = event.interaction
     if interaction.type == 2 or "Menu de rôles" not in interaction.message.content:
         return
 

@@ -99,10 +99,12 @@ async def levels(ctx: Context):
         for i, entry in enumerate(data[:10])
     }
 
-    for field in plugin.get_page(guild, data):
+    for field in get_page(guild, data):
         embed.add_field(name=field[0], value=field[1], inline=True)
 
-    message = await ctx.respond(embed=embed)
+    resp = await ctx.respond(embed=embed)
+    message = await resp.message()
+
     for emoji in ["◀️", "▶️"]:
         await message.add_reaction(emoji)
 

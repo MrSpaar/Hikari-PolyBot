@@ -1,4 +1,4 @@
-from hikari import Member, Embed, InteractionCreateEvent
+from hikari import Member, Embed, InteractionCreateEvent, SelectMenuComponent, CommandInteraction
 from hikari.impl import ActionRowBuilder
 from lightbulb import (
     Context,
@@ -27,11 +27,10 @@ plugin = Plugin("Jeux")
 @command("chess", "Jouer aux échecs contre quelqu'un")
 @implements(SlashCommand)
 async def chess(ctx: Context):
-    if ctx.options.opponent.is_bot or ctx.options.opponent == ctx.member:
-        return await ctx.respond(
-            "Tu ne peux pas jouer contre un bot ou contre toi-même"
-        )
+    if ctx.options.membre.is_bot or ctx.options.membre == ctx.member:
+        return await ctx.respond("Tu ne peux pas jouer contre un bot ou contre toi-même")
 
+    await ctx.respond("\u200b")
     await Chess(ctx).start()
 
 
@@ -172,20 +171,20 @@ async def reaction(ctx: Context):
     )
 
 
-# @plugin.listener(InteractionCreateEvent)
-# async def on_button_click(event):
-#     interaction = event.interaction
-#     if not interaction.message:
-#         return
+@plugin.listener(InteractionCreateEvent)
+async def on_button_click(event):
+    if isinstance(event.interaction, CommandInteraction):
+        return
 
-#     button = interaction.message.components[0].components[0]
+    interaction = event.interaction
+    button = interaction.message.components[0].components[0]
 
-#     if isinstance(button, SelectMenuComponent):
-#         return
+    if isinstance(button, SelectMenuComponent):
+        return
 
-#     if button.label == 'Appuie dès que je change de couleur' and button.style == 4:
-#         embed = Embed(color=0xe74c3c, description='❌ Tu as appuyé trop tôt')
-#         return await event.interaction.create_initial_response(response_type=7, components=[], embed=embed)
+    if button.label == 'Appuie dès que je change de couleur' and button.style == 4:
+        embed = Embed(color=0xe74c3c, description='❌ Tu as appuyé trop tôt')
+        return await event.interaction.create_initial_response(response_type=7, components=[], embed=embed)
 
 
 def load(bot):

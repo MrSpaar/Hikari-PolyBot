@@ -20,8 +20,8 @@ plugin = Plugin("Recherche")
 
 
 @plugin.command()
-@option("categorie", "La catégorie dans laquelle rechercher des streams")
 @option("recherche", "Les mots-clés pour affiner la recherche", modifier=OptionModifier.GREEDY)
+@option("categorie", "La catégorie dans laquelle rechercher des streams")
 @command("twitch", "Rechercher des streams Twitch")
 @implements(SlashCommand)
 async def twitch(ctx: Context):
@@ -41,7 +41,7 @@ async def twitch(ctx: Context):
         streams = resp[:10]
     else:
         streams = filter(
-            lambda s: any(key in s["channel"]["status"].lower() for key in ctx.options.recherche),
+            lambda s: any(key in s["channel"]["status"].lower() for key in ctx.options.recherche.split()),
             resp[:100]
         )
 
@@ -179,7 +179,8 @@ async def meteo(ctx: Context):
         .set_thumbnail("https://openweathermap.org/img/w/" + info["ID"])
     )
 
-    await ctx.respond(embed=embed)
+    await ctx.respond("\u200b")
+    await ctx.get_channel().send(embed=embed)
 
 
 def load(bot):

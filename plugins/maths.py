@@ -36,24 +36,22 @@ async def calcul(ctx: Context):
 
 
 @plugin.command()
-@option("base1", "La base du nombre à convertir", int)
-@option("base2", "La base du nombre converti", int)
+@option("base_arrivee", "La base du nombre à convertir", int)
+@option("base_initiale", "La base du nombre converti", int)
 @option("nombre", "Le nombre à convertir")
 @command("base", "Convertir un nombre d'une base à une autre base (base 62 maximum)")
 @implements(SlashCommand)
 async def base(ctx: Context):
-    if ctx.options.base1 > 62 or ctx.options.base2 > 62:
+    if ctx.options.base_initiale > 62 or ctx.options.base_arrivee > 62:
         return await ctx.respond("❌ Base trop grande (base 52 maximum)")
 
-    conv = base_conv(ctx.options.nombre, ctx.options.base1, ctx.options.base2)
-    embed = Embed(color=0x3498DB, description=f"⚙️ `{ctx.options.nombre}` en base {ctx.options.base2} : `{conv}`")
+    conv = base_conv(ctx.options.nombre, ctx.options.base_initiale, ctx.options.base_arrivee)
+    embed = Embed(color=0x3498DB, description=f"⚙️ `{ctx.options.nombre}` en base {ctx.options.base_arrivee} : `{conv}`")
     await ctx.respond(embed=embed)
 
 
 @plugin.command()
-@option(
-    "texte", "Le texte à convertir en binaire", modifier=OptionModifier.CONSUME_REST
-)
+@option("texte", "Le texte à convertir en binaire", modifier=OptionModifier.CONSUME_REST)
 @command("binaire", description="Convertir du texte en binaire")
 @implements(SlashCommand)
 async def binaire(ctx: Context):
@@ -62,7 +60,7 @@ async def binaire(ctx: Context):
     except:
         conv = [bin(s)[2:] for s in bytearray(ctx.options.texte, "utf-8")]
 
-    embed = Embed(color=0x3498DB, description=f'⚙️ Binaire : `{"".join(conv)}`')
+    embed = Embed(color=0x3498DB, description=f'⚙️ `{ctx.options.texte}` = `{"".join(conv)}`')
     await ctx.respond(embed=embed)
 
 
@@ -71,7 +69,7 @@ async def binaire(ctx: Context):
 @command("hexa", "Convertir du texte en hexadécimal")
 @implements(SlashCommand)
 async def hexa(ctx: Context):
-    embed = Embed(color=0x3498DB, description=f"⚙️ Hexadécimal : `{ctx.options.texte.encode().hex()}`",)
+    embed = Embed(color=0x3498DB, description=f"⚙️ `{ctx.options.texte}` = `{ctx.options.texte.encode().hex()}`",)
     await ctx.respond(embed=embed)
 
 

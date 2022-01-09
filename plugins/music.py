@@ -126,10 +126,10 @@ async def play(ctx: Context):
         embed1 = Embed(color=0x3498DB, description=f"🎵 [`{track.info.title}`]({track.info.uri}) de `{track.info.author}`\n🙍 Demandé par {ctx.author.mention}",)
         embed2 = Embed(color=0x99AAB5, description="*Pas de vidéos en attente*")
 
-        message = await ctx.respond(embeds=[embed1, embed2])
+        resp = await ctx.respond(embeds=[embed1, embed2])
+        message = await resp.message()
         await node.set_data(message)
 
-    await ctx.message.delete()
     await ctx.bot.data.lavalink.play(ctx.guild_id, track).requester(ctx.author.id).queue()
 
 
@@ -137,7 +137,6 @@ async def play(ctx: Context):
 @command("leave", "Déconnecter le bot du channel")
 @implements(SlashCommand)
 async def leave(ctx: Context):
-    await ctx.message.delete()
     await _stop(ctx.bot.data.lavalink, ctx.guild_id)
 
 
@@ -153,9 +152,7 @@ async def skip(ctx: Context):
         return await ctx.respond(embed=embed)
 
     if not node.queue and not node.now_playing:
-        await ctx._stop(ctx.bot.data.lavalink, ctx.guild_id)
-
-    await ctx.message.delete()
+        await _stop(ctx.bot.data.lavalink, ctx.guild_id)
 
 
 @plugin.command()
@@ -163,7 +160,6 @@ async def skip(ctx: Context):
 @implements(SlashCommand)
 async def pause(ctx):
     await ctx.bot.data.lavalink.pause(ctx.guild_id)
-    await ctx.message.delete()
 
 
 @plugin.command()
@@ -171,7 +167,6 @@ async def pause(ctx):
 @implements(SlashCommand)
 async def resume(ctx):
     await ctx.bot.data.lavalink.resume(ctx.guild_id)
-    await ctx.message.delete()
 
 
 def load(bot):

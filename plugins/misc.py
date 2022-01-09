@@ -1,5 +1,6 @@
 from hikari import Embed, User, Emoji
 from lightbulb import (
+    EmojiConverter,
     Plugin,
     Context,
     SlashCommand,
@@ -24,8 +25,6 @@ async def sondage(ctx: Context):
     embed = Embed(title=f">> {question[0].upper() + question[1:]}", color=0x3498DB)
     embed.set_author(name=f"Sondage de {ctx.member.display_name}", icon=ctx.author.avatar_url)
 
-    await ctx.message.delete()
-
     for i in range(1, len(items)):
         embed.add_field(
             name=f"{reactions[i-1]} Option n°{i}",
@@ -33,7 +32,8 @@ async def sondage(ctx: Context):
             inline=False,
         )
 
-    message = await ctx.respond(embed=embed)
+    resp = await ctx.respond(embed=embed)
+    message = await resp.message()
 
     for i in range(len(items[1:])):
         await message.add_reaction(reactions[i])
@@ -55,10 +55,12 @@ async def pp(ctx: Context):
 @command("emoji", description="Afficher l'image d'origine d'un emoji")
 @implements(SlashCommand)
 async def emoji(ctx: Context):
+    emoji = await EmojiConverter(ctx).convert(ctx.options.emoji)
+
     embed = (
         Embed(color=ctx.member.get_top_role().color)
-        .set_image(ctx.options.emoji.url)
-        .set_footer(text=f"<:{ctx.options.emoji.name}:{ctx.options.emoji.id}>")
+        .set_image(emoji.url)
+        .set_footer(text=f"<:{emoji.name}:{emoji.id}>")
     )
 
     await ctx.respond(embed=embed)

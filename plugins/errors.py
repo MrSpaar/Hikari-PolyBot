@@ -7,14 +7,14 @@ plugin = Plugin("Erreurs")
 
 
 @plugin.listener(CommandErrorEvent)
-async def on_command_error(self, event):
+async def on_command_error(event):
     if not event.context:
-        guild = self.bot.cache.get_guild(event.message.guild_id)
+        guild = plugin.bot.cache.get_guild(event.message.guild_id)
         channel = guild.get_channel(event.message.channel_id)
 
         closest = gcm(
             event.message.content.split()[0][1:],
-            [cmd.name for cmd in self.bot.commands],
+            [cmd.name for cmd in plugin.bot.commands],
         )
 
         embed = Embed(color=0xE74C3C, description=f"❌ Commande inexistante")

@@ -12,13 +12,11 @@ from motor.motor_asyncio import AsyncIOMotorClient
 class Bot(BotApp):
     def __init__(self):
         load_dotenv()
-        guilds = (752921557214429316, 634339847108165632, 339045627478540288)
-
         super().__init__(
             intents=Intents.ALL,
             token=environ["BOT_TOKEN"],
             logs="ERROR",
-            default_enabled_guilds=guilds,
+            default_enabled_guilds=[],
         )
 
         self.data = Data()

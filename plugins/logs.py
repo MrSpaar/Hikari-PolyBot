@@ -13,7 +13,7 @@ async def get_audit_log(guild, event):
     return entries[0].entries[log_id]
 
 
-async def send_log(guild: GatewayGuild, embeds: list[Embed], attachments: list[Attachment] = None) -> dict:
+async def send_log(guild: GatewayGuild, embeds: list[Embed], attachments: list[Attachment] = []) -> dict:
     settings = await plugin.bot.db.setup.find({"_id": guild.id})
     channel = guild.get_channel(settings["logs"])
 

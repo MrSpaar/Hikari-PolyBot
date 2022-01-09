@@ -1,6 +1,5 @@
 from hikari import (
-    Role,
-    TextableChannel,
+    Snowflake,
     Embed,
     Permissions,
     GuildJoinEvent,
@@ -19,31 +18,25 @@ from lightbulb import (
     has_guild_permissions,
 )
 
-from typing import Union
-
 plugin = Plugin("Configuration")
-plugin.add_checks(guild_only | has_guild_permissions(Permissions.ADMINISTRATOR))
+plugin.add_checks(guild_only, has_guild_permissions(Permissions.ADMINISTRATOR))
 
 
 @plugin.command()
-@option("option", "Le paramètre à modifier (logs, channel, new)")
-@option("valeur", "La nouvelle valeur du paramètre (role ou channel)", Union[Role, TextableChannel],)
+@option("valeur", "La nouvelle valeur du paramètre (role ou channel)", Snowflake)
+@option("reglage", "Le paramètre à modifier (logs, channel, new)", choices=['new', 'logs', 'channel'])
 @command("set", "Modifier les paramètres du bot")
 @implements(SlashCommand)
-async def _set(ctx: Context, key: str, value):
+async def _set(ctx: Context):
     settings = {
-        "mute": "Rôle des muets",
+        "new": "Rôle des muets",
         "logs": "Channel de logs",
         "channel": "Channel du bot",
     }
 
-    if key not in settings:
-        embed = Embed(color=0xE74C3C, description=f"❌ Clé invalide : {', '.join(settings.keys())}")
-        return await ctx.respond(embed=embed)
+    await ctx.bot.db.setup.update({"_id": ctx.guild_id}, {"$set": {ctx.options.reglage: ctx.options.valeur.id}})
 
-    await ctx.bot.db.setup.update({"_id": ctx.guild_id}, {"$set": {key: value.id}})
-
-    embed = Embed(color=0x2ECC71, description=f"{settings[key]} modifié ({value.mention})")
+    embed = Embed(color=0x2ECC71, description=f"{settings[ctx.options.reglage]} modifié ({ctx.options.valeur.mention})")
     await ctx.respond(embed=embed)
 
 
@@ -56,9 +49,9 @@ async def settings(ctx: Context):
 
     channel = getattr(guild.get_channel(settings["channel"]), "mention", "pas défini")
     logs = getattr(guild.get_channel(settings["logs"]), "mention", "pas défini")
-    mute = getattr(guild.get_role(settings["mute"]), "mention", "pas défini")
+    new = getattr(guild.get_role(settings["new"]), "mention", "pas défini")
 
-    embed = Embed(color=0x3498DB, description=f"💬 Bot : {channel}\n📟 Logs : {logs}\n🔇 Mute : {mute}",)
+    embed = Embed(color=0x3498DB, description=f"💬 Bot : {channel}\n📟 Logs : {logs}\n🙍 Rôle des nouveaux : {new}",)
     await ctx.respond(embed=embed)
 
 
@@ -69,7 +62,6 @@ async def on_guild_join(event):
     await plugin.bot.db.setup.insert(
         {
             "_id": guild.id,
-            "mute": None,
             "logs": None,
             "channel": None,
             "new": None,

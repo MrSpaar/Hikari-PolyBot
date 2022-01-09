@@ -1,10 +1,11 @@
 from hikari import (
+    Snowflake,
     Embed,
-    Role,
     Member,
+    Role,
     PermissionOverwrite,
     Permissions,
-    VoiceServerUpdateEvent,
+    VoiceStateUpdateEvent
 )
 
 from lightbulb import (
@@ -19,10 +20,9 @@ from lightbulb import (
 )
 
 from core.funcs import vc_check
-from typing import Union
 
 plugin = Plugin("Vocaux")
-plugin.add_checks(guild_only | vc_check)
+plugin.add_checks(guild_only, vc_check)
 
 
 @plugin.command()
@@ -57,7 +57,7 @@ async def owner(ctx: Context):
 
 
 @plugin.command()
-@option("mentions", "Roles ou membres qui ont accès au channel", Union[Role, Member], modifier=OptionModifier.GREEDY)
+@option("mentions", "Roles ou membres qui ont accès au channel", Snowflake, modifier=OptionModifier.GREEDY)
 @command("private", "Rendre le channel privé")
 @implements(SlashCommand)
 async def private(ctx: Context):
@@ -97,7 +97,7 @@ async def private(ctx: Context):
     await ctx.respond(embed=embed)
 
 
-@plugin.listener(VoiceServerUpdateEvent)
+@plugin.listener(VoiceStateUpdateEvent)
 async def voice_update(event):
     guild = plugin.bot.cache.get_guild(event.guild_id)
 

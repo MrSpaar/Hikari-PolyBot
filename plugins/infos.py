@@ -1,4 +1,4 @@
-from hikari import Embed, Member, Role, GuildTextChannel, GuildVoiceChannel, Permissions
+from hikari import Embed, Member, Role, GuildTextChannel, Permissions
 from lightbulb import (
     Plugin,
     Context,
@@ -22,7 +22,7 @@ async def serverinfo(ctx: Context):
     guild = ctx.get_guild()
     channels = guild.get_channels().values()
 
-    text = len(filter(lambda c: isinstance(c, GuildTextChannel), channels))
+    text = len(list(filter(lambda c: isinstance(c, GuildTextChannel), channels)))
     voice = len(channels) - text
     emojis = [emoji.mention for emoji in guild.get_emojis().values()]
 
@@ -93,7 +93,7 @@ async def userinfo(ctx: Context):
         + f"🏷️ Rôle principal : {member.get_top_role().mention}\n"
         + (f"🚩 Flags : {', '.join(flags)}\n" if flags else "")
         + (f"📈 A commencé à booster le serveur <t:{boost}:R>\n\n" if boost else "")
-        + ("🏃‍♂️ Activités :\n- " + "\n- ".join(activities) if activities else "")
+        + ("\n🏃‍♂️ Activités :\n- " + "\n- ".join(activities) if activities else "")
     )
 
     embed = Embed(color=0x1ABC9C, description=description)
@@ -117,6 +117,7 @@ async def roleinfo(ctx: Context):
         Permissions.MANAGE_CHANNELS: "Gérer les salons",
         Permissions.MANAGE_NICKNAMES: "Gérer les pseudos",
         Permissions.MANAGE_THREADS: "Gérer les fils",
+        Permissions.START_EMBEDDED_ACTIVITIES: "Gérer les évènements",
         Permissions.MANAGE_WEBHOOKS: "Gérer les webhooks",
         Permissions.MANAGE_MESSAGES: "Gérer les messages",
         Permissions.MANAGE_EMOJIS_AND_STICKERS: "Gérer les emojis et stickers",
@@ -137,6 +138,9 @@ async def roleinfo(ctx: Context):
         Permissions.ATTACH_FILES: "Envoyer des fichiers",
         Permissions.SEND_TTS_MESSAGES: "Envoyer des TTS",
         Permissions.EMBED_LINKS: "Envoyer des intégrations",
+        Permissions.CREATE_PRIVATE_THREADS: "Créer des threads privés",
+        Permissions.CREATE_PUBLIC_THREADS: "Créer des threads publiques",
+        Permissions.SEND_MESSAGES_IN_THREADS: "Envoyer des messages dans un thread",
         Permissions.SEND_MESSAGES: "Envoyer des messages",
         Permissions.READ_MESSAGE_HISTORY: "Lire les historiques de messages",
         Permissions.USE_APPLICATION_COMMANDS: "Utiliser les applications",
