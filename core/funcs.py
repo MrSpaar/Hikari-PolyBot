@@ -14,7 +14,7 @@ async def api_call(link: str, headers: dict = None, json: bool = True) -> Union[
 
 
 def normalize_string(s: str) -> str:
-    return normalize(u'NFKD', s).encode('ascii', 'ignore').decode('utf8')
+    return normalize(u"NFKD", s).encode("ascii", "ignore").decode("utf8")
 
 
 def now(utc: bool = False) -> datetime:
@@ -26,10 +26,10 @@ def now(utc: bool = False) -> datetime:
 def _is_higher(ctx: Context):
     args = ctx.message.content.split()
     guild = ctx.get_guild()
-    member = guild.get_member(int(args[1].strip('<@!>')))
+    member = guild.get_member(int(args[1].strip("<@!>")))
 
     if not member:
-        raise errors.ConverterFailure('member')
+        raise errors.ConverterFailure("member")
 
     author_top = ctx.member.get_top_role()
     member_top = member.get_top_role()
@@ -44,17 +44,20 @@ async def _vc_check(ctx: Context):
     voice = guild.get_voice_state(ctx.author)
 
     if not voice:
-        raise errors.CommandInvocationError('channel')
+        raise errors.CommandInvocationError("channel")
 
-    entry = await ctx.bot.db.pending.find({'guild_id': guild.id, 'voc_id': guild.get_channel(voice.channel_id).id})
+    entry = await ctx.bot.db.pending.find(
+        {"guild_id": guild.id, "voc_id": guild.get_channel(voice.channel_id).id}
+    )
     if not entry:
-        raise errors.CommandInvocationError('Not Temp')
+        raise errors.CommandInvocationError("Not Temp")
 
-    owner = guild.get_member(entry['owner'])
+    owner = guild.get_member(entry["owner"])
     if ctx.author != owner:
-        raise errors.CommandInvocationError('Not owner')
+        raise errors.CommandInvocationError("Not owner")
 
     return True
+
 
 vc_check = Check(_vc_check)
 is_higher = Check(_is_higher)

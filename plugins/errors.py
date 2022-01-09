@@ -3,7 +3,8 @@ from lightbulb import Plugin, CommandErrorEvent, errors
 
 from difflib import get_close_matches as gcm
 
-plugin = Plugin('Erreurs')
+plugin = Plugin("Erreurs")
+
 
 @plugin.listener(CommandErrorEvent)
 async def on_command_error(self, event):
@@ -11,8 +12,14 @@ async def on_command_error(self, event):
         guild = self.bot.cache.get_guild(event.message.guild_id)
         channel = guild.get_channel(event.message.channel_id)
 
-        closest = gcm(event.message.content.split()[0][1:], [cmd.name for cmd in self.bot.commands])
-        embed = Embed(color=0xe74c3c, description=f"❌ Commande inexistante{'' if not closest else ', peut-être voulais-tu utiliser `' + closest[0] + '` ?'}")
+        closest = gcm(
+            event.message.content.split()[0][1:],
+            [cmd.name for cmd in self.bot.commands],
+        )
+
+        embed = Embed(color=0xE74C3C, description=f"❌ Commande inexistante")
+        embed.description += f', peut-être voulais-tu utiliser `{closest[0]}` ?' if closest else '.'
+
         return await channel.send(embed=embed)
 
     ctx, error = event.context, event.exception
@@ -27,24 +34,24 @@ async def on_command_error(self, event):
         errors.OnlyInGuild: "❌ Cette commande n'est utilisable que sur un serveur",
         errors.NotOwner: "❌ Seul le créateur du bot peut utiliser cette commande",
         errors.ConverterFailure: {
-            'member': '❌ Membre inexistant',
-            'emoji': "❌ Cette commande ne marche qu'avec les emojis custom",
-            'channel': '❌ Channel introuvable',
-            'int': '❌ Les arguments doivent être des nombres entiers'
+            "member": "❌ Membre inexistant",
+            "emoji": "❌ Cette commande ne marche qu'avec les emojis custom",
+            "channel": "❌ Channel introuvable",
+            "int": "❌ Les arguments doivent être des nombres entiers",
         },
         errors.CommandInvocationError: {
-            'Not temp': "❌ Tu n'es pas dans un channel temporaire",
-            'Not owner': "❌ Tu n'es pas le créateur de ce channel",
-            'channel': "❌ Tu n'es connecté à aucun channel",
-            'string index': '❌ Erreur dans la conversion',
-            'list index': "❌ Recherche invalide, aucun résultat trouvé",
-            'UnknownObjectException': "❌ Recherche invalide, aucun résultat trouvé",
-            'not enough values to unpack': "❌ Lancer invalide",
+            "Not temp": "❌ Tu n'es pas dans un channel temporaire",
+            "Not owner": "❌ Tu n'es pas le créateur de ce channel",
+            "channel": "❌ Tu n'es connecté à aucun channel",
+            "string index": "❌ Erreur dans la conversion",
+            "list index": "❌ Recherche invalide, aucun résultat trouvé",
+            "UnknownObjectException": "❌ Recherche invalide, aucun résultat trouvé",
+            "not enough values to unpack": "❌ Lancer invalide",
             "KeyError: 'list'": "❌ Ville introuvable ou inexistante",
-            'This video may be': "❌ Restriction d'âge, impossible de jouer la vidéo",
-            'No video formats found': "❌ Aucun format vidéo trouvé, impossible de jouer la vidéo",
-            'RecursionError': '❌ Trop de récursions, nombre trop grand',
-            '4000': "❌ Mon message est trop long, impossible de l'envoyer",
+            "This video may be": "❌ Restriction d'âge, impossible de jouer la vidéo",
+            "No video formats found": "❌ Aucun format vidéo trouvé, impossible de jouer la vidéo",
+            "RecursionError": "❌ Trop de récursions, nombre trop grand",
+            "4000": "❌ Mon message est trop long, impossible de l'envoyer",
         },
     }
 
@@ -60,7 +67,7 @@ async def on_command_error(self, event):
     if isinstance(error_entry, dict):
         raise error
 
-    embed = Embed(color=0xe74c3c, description=error_entry)
+    embed = Embed(color=0xE74C3C, description=error_entry)
     await ctx.respond(embed=embed)
 
 

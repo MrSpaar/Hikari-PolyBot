@@ -5,7 +5,7 @@ from core.cls import Bot
 from core.funcs import now
 from time import mktime
 
-plugin = Plugin('Logs')
+plugin = Plugin("Logs")
 
 
 async def get_audit_log(guild, event):
@@ -15,10 +15,11 @@ async def get_audit_log(guild, event):
 
 
 async def send_log(guild: GatewayGuild, embed: Embed):
-    settings = await plugin.bot.db.setup.find({'_id': guild.id})
+    settings = await plugin.bot.db.setup.find({"_id": guild.id})
+    channel = guild.get_channel(settings["logs"])
 
-    if settings['logs'] and (channel := guild.get_channel(settings['logs'])):
-        await channel.send(embed=embed)        
+    if channel:
+        await channel.send(embed=embed)
 
     return settings
 
@@ -27,15 +28,17 @@ async def send_log(guild: GatewayGuild, embed: Embed):
 async def on_member_join(event):
     guild, member = plugin.bot.cache.get_guild(event.guild_id), event.member
 
-    embed = Embed(color=0x2ecc71, description=f':inbox_tray: {member.mention} a rejoint le serveur !')
+    embed = Embed(color=0x2ECC71, description=f":inbox_tray: {member.mention} a rejoint le serveur !")
     settings = await send_log(guild, embed)
 
-    if settings['welcome']:
-        channel = guild.get_channel(settings['welcome']['id'])
-        await channel.send(settings['welcome']['txt'].replace('<mention>', member.mention))
+    if settings["welcome"]:
+        channel = guild.get_channel(settings["welcome"]["id"])
+        message = settings["welcome"]["txt"].replace("<mention>", member.mention)
 
-    if settings['new']:
-        role = guild.get_role(settings['new'])
+        await channel.send(message)
+
+    if settings["new"]:
+        role = guild.get_role(settings["new"])
         await member.add_role(role)
 
 
@@ -45,9 +48,9 @@ async def on_member_remove(event):
         return
 
     guild, member = plugin.bot.cache.get_guild(event.guild_id), event.old_member
-    name = f'{member.display_name} ({member})' if member.display_name else str(member)
+    name = f"{member.display_name} ({member})" if member.display_name else str(member)
 
-    embed = Embed(color=0xe74c3c, description=f':outbox_tray: {name} a quitté le serveur')
+    embed = Embed(color=0xE74C3C, description=f":outbox_tray: {name} a quitté le serveur")
     await send_log(guild, embed)
 
 
@@ -55,12 +58,14 @@ async def on_member_remove(event):
 async def on_member_ban(event):
     guild, target = plugin.bot.cache.get_guild(event.guild_id), event.user
 
-    try: entry = await get_audit_log(guild, AuditLogEventType.MEMBER_BAN_ADD)
-    except: return
+    try:
+        entry = await get_audit_log(guild, AuditLogEventType.MEMBER_BAN_ADD)
+    except:
+        return
 
     reason, user = entry.reason, guild.get_member(entry.user_id)
 
-    embed = Embed(color=0xe74c3c, description=f"👨‍⚖️ {user.mention} a ban {target.mention}\n❔ Raison : {reason or 'Pas de raison'}")
+    embed = Embed(color=0xE74C3C, description=f"👨‍⚖️ {user.mention} a ban {target.mention}\n❔ Raison : {reason or 'Pas de raison'}",)
     await send_log(guild, embed)
 
 
@@ -68,12 +73,14 @@ async def on_member_ban(event):
 async def on_member_unban(event):
     guild, target = plugin.bot.cache.get_guild(event.guild_id), event.user
 
-    try: entry = await get_audit_log(guild, AuditLogEventType.MEMBER_BAN_REMOVE)
-    except : return
+    try:
+        entry = await get_audit_log(guild, AuditLogEventType.MEMBER_BAN_REMOVE)
+    except:
+        return
 
     reason, user = entry.reason, guild.get_member(entry.user_id)
 
-    embed = Embed(color=0xc27c0e, description=f"👨‍⚖️ {user.mention} a unban {target.mention}\n❔ Raison : {reason or 'Pas de raison'}")
+    embed = Embed(color=0xC27C0E, description=f"👨‍⚖️ {user.mention} a unban {target.mention}\n❔ Raison : {reason or 'Pas de raison'}",)
     await send_log(guild, embed)
 
 
@@ -85,11 +92,13 @@ async def on_member_update(event):
     if not before or not after:
         return
 
-    embed = Embed(color=0x3498db)
+    embed = Embed(color=0x3498DB)
 
     if before.display_name != after.display_name:
-        try: entry = await get_audit_log(guild, AuditLogEventType.MEMBER_UPDATE)
-        except: return
+        try:
+            entry = await get_audit_log(guild, AuditLogEventType.MEMBER_UPDATE)
+        except:
+            return
 
         member = guild.get_member(entry.user_id)
 
@@ -98,8 +107,10 @@ async def on_member_update(event):
         else:
             embed.description = f"📝 {member.mention} a changé de surnom de {before.mention} (`{before.display_name}` → `{after.display_name}`)"
     elif (broles := before.get_roles()) != (aroles := after.get_roles()):
-        try: entry = await get_audit_log(guild, AuditLogEventType.MEMBER_ROLE_UPDATE)
-        except: return
+        try:
+            entry = await get_audit_log(guild, AuditLogEventType.MEMBER_ROLE_UPDATE)
+        except:
+            return
 
         member = guild.get_member(entry.user_id)
         role, = set(broles).symmetric_difference(set(aroles))
@@ -126,33 +137,42 @@ async def on_message_delete(event):
     channel = event.get_channel()
     message = event.old_message
 
-    if message.author.is_bot or 'test' in channel.name or (message.content and len(message.content) == 1):
+    if (
+        message.author.is_bot
+        or "test" in channel.name
+        or (message.content and len(message.content) == 1)
+    ):
         return
 
     date = message.timestamp.replace(tzinfo=None)
     mentions = tuple(message.mentions.users.keys()) + message.mentions.role_ids
 
-    attachments = {'images': [], 'other': []}
+    attachments = {"images": [], "other": []}
     for attachment in message.attachments:
-        (attachments['other'], attachments['images'])[attachment.media_type.split('/')[0] == 'image'].append(attachment)
+        (attachments["other"], attachments["images"])[
+            attachment.media_type.split("/")[0] == "image"
+        ].append(attachment)
 
-    if (now(utc=True)-date).total_seconds() <= 20 and mentions and message.content:
-        emoji, color = '<:ping:768097026402942976>', 0xe74c3c
+    if (now(utc=True) - date).total_seconds() <= 20 and mentions and message.content:
+        emoji, color = "<:ping:768097026402942976>", 0xE74C3C
     elif message.content and not message.attachments:
-        emoji, color = '🗑️', 0x979c9f
+        emoji, color = "🗑️", 0x979C9F
     else:
-        emoji, color = '🗑️', 0xf1c40f
+        emoji, color = "🗑️", 0xF1C40F
 
-    embeds = [Embed(color=color, description=f'{emoji} Message de {message.author.mention} supprimé dans {channel.mention}:')]
+    embeds = [Embed(color=color,description=f"{emoji} Message de {message.author.mention} supprimé dans {channel.mention}:",)]
 
     if message.content:
-        embeds[0].description += f'\n\n> {message.content}'
+        embeds[0].description += f"\n\n> {message.content}"
 
-    if attachments['images']:
-        embeds[0].set_image(attachments['images'][0])
-        embeds += [(Embed(color=0xf1c40f).set_image(image)) for image in attachments['images'][1:]]
+    if attachments["images"]:
+        embeds[0].set_image(attachments["images"][0])
+        embeds += [
+            (Embed(color=0xF1C40F).set_image(image))
+            for image in attachments["images"][1:]
+        ]
 
-    await self.send_log(guild, embeds, attachments['other'])
+    await send_log(guild, embeds, attachments["other"])
 
 
 @plugin.listener(events.InviteCreateEvent)
@@ -162,11 +182,15 @@ async def on_invite_create(event):
     if not invite.inviter:
         return
 
-    url = f'https://discord.gg/{invite.code}'
-    uses = f'{invite.max_uses} fois' if invite.max_uses else "à l'infini"
-    expire = f'<t:{int(mktime((now() + invite.max_age).timetuple()))}:R>' if invite.max_age else 'jamais'
+    url = f"https://discord.gg/{invite.code}"
+    uses = f"{invite.max_uses} fois" if invite.max_uses else "à l'infini"
+    expire = (
+        f"<t:{int(mktime((now() + invite.max_age).timetuple()))}:R>"
+        if invite.max_age
+        else "jamais"
+    )
 
-    embed = Embed(color=0x3498db, description=f'✉️ {invite.inviter.mention} a créé une [invitation]({url}) qui expire {expire}, utilisable {uses}')
+    embed = Embed(color=0x3498DB, description=f"✉️ {invite.inviter.mention} a créé une [invitation]({url}) qui expire {expire}, utilisable {uses}",)
     await send_log(guild, embed)
 
 

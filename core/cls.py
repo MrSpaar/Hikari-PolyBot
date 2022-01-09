@@ -14,7 +14,12 @@ class Bot(BotApp):
         load_dotenv()
         guilds = (752921557214429316, 634339847108165632, 339045627478540288)
 
-        super().__init__(intents=Intents.ALL,token=environ['BOT_TOKEN'], logs='ERROR', default_enabled_guilds=guilds)
+        super().__init__(
+            intents=Intents.ALL,
+            token=environ["BOT_TOKEN"],
+            logs="ERROR",
+            default_enabled_guilds=guilds,
+        )
 
         self.data = Data()
         self.db = Database()
@@ -40,27 +45,27 @@ class Cooldown:
         if member.id not in self.cooldowns:
             self.cooldowns[member.id] = {
                 guild.id: {
-                    'usages': 0,
-                    'cool': self.now + timedelta(seconds=self.seconds)
+                    "usages": 0,
+                    "cool": self.now + timedelta(seconds=self.seconds),
                 }
             }
             return True
 
         if guild.id not in self.cooldowns[member.id]:
             self.cooldowns[member.id][guild.id] = {
-                'usages': 0,
-                'cool': self.now + timedelta(seconds=self.seconds)
+                "usages": 0,
+                "cool": self.now + timedelta(seconds=self.seconds),
             }
             return True
 
-        if self.now > self.cooldowns[member.id][guild.id]['cool']:
-            self.cooldowns[member.id][guild.id]['usages'] = 0
-            self.cooldowns[member.id][guild.id]['cool'] += timedelta(seconds=self.seconds)
+        if self.now > self.cooldowns[member.id][guild.id]["cool"]:
+            self.cooldowns[member.id][guild.id]["usages"] = 0
+            self.cooldowns[member.id][guild.id]["cool"] += timedelta(seconds=self.seconds)
             return True
 
-        self.cooldowns[member.id][guild.id]['usages'] += 1
+        self.cooldowns[member.id][guild.id]["usages"] += 1
 
-        if self.cooldowns[member.id][guild.id]['usages'] <= self.usages-1:
+        if self.cooldowns[member.id][guild.id]["usages"] <= self.usages - 1:
             return True
 
         return False
@@ -68,11 +73,11 @@ class Cooldown:
 
 class Database:
     def __init__(self):
-        self.client = AsyncIOMotorClient(environ['DATABASE_URL'])
+        self.client = AsyncIOMotorClient(environ["DATABASE_URL"])
 
-        self.setup = Collection(self.client['data']['setup'])
-        self.pending = Collection(self.client['data']['pending'])
-        self.members = Collection(self.client['data']['members'])
+        self.setup = Collection(self.client["data"]["setup"])
+        self.pending = Collection(self.client["data"]["pending"])
+        self.members = Collection(self.client["data"]["members"])
 
 
 class Collection:

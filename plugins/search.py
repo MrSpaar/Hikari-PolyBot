@@ -1,5 +1,13 @@
 from hikari import Embed
-from lightbulb import Plugin, Context, SlashCommand, OptionModifier, command, option, implements
+from lightbulb import (
+    Plugin,
+    Context,
+    SlashCommand,
+    OptionModifier,
+    command,
+    option,
+    implements,
+)
 
 from core.funcs import api_call
 from datetime import datetime, timedelta
@@ -8,115 +16,133 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 from os import environ
 
-plugin = Plugin('Recherche')
+plugin = Plugin("Recherche")
 
 
 @plugin.command()
-@option('categorie', 'La catégorie dans laquelle rechercher des streams')
-@option('recherche', 'Les mots-clés pour affiner la recherche', modifier=OptionModifier.GREEDY)
-@command('twitch', 'Rechercher des streams Twitch')
+@option("categorie", "La catégorie dans laquelle rechercher des streams")
+@option("recherche", "Les mots-clés pour affiner la recherche", modifier=OptionModifier.GREEDY)
+@command("twitch", "Rechercher des streams Twitch")
 @implements(SlashCommand)
 async def twitch(ctx: Context):
     query = f"https://api.twitch.tv/kraken/search/streams?query={ctx.options.categorie}&limit={100 if ctx.options.recherche else 10}"
 
     headers = {
-        'Accept': 'application/vnd.twitchtv.v5+json',
-        'Client-ID': environ['TWITCH_CLIENT'],
-        'Authorization': f"Bearer {environ['TWITCH_TOKEN']}",
+        "Accept": "application/vnd.twitchtv.v5+json",
+        "Client-ID": environ["TWITCH_CLIENT"],
+        "Authorization": f"Bearer {environ['TWITCH_TOKEN']}",
     }
 
-    resp = (await api_call(query, headers))['streams']
-    embed = (Embed(color=0x3498db)
-                .set_author(name=f"Twitch - {resp[0]['game']}", icon='https://i.imgur.com/gArdgyC.png'))
+    resp = (await api_call(query, headers))["streams"]
+    embed = Embed(color=0x3498DB)
+    embed.set_author(name=f"Twitch - {resp[0]['game']}", icon="https://i.imgur.com/gArdgyC.png")
 
-    func = lambda s: any(key in s['channel']['status'].lower() for key in ctx.options.recherche)
-    streams = resp[:10] if not ctx.options.recherche else filter(func, resp[:100])
+    if not ctx.options.recherche:
+        streams = resp[:10]
+    else:
+        streams = filter(
+            lambda s: any(key in s["channel"]["status"].lower() for key in ctx.options.recherche),
+            resp[:100]
+        )
 
     for stream in streams:
-        stream = stream['channel']
+        stream = stream["channel"]
         value = f"[{stream['status']}]({stream['url']})"
-        embed.add_field(name=stream['display_name'], value=value, inline=True)
+        embed.add_field(name=stream["display_name"], value=value, inline=True)
 
     if len(embed.fields) == 0:
-        embed.add_field(name='\u200b', value='Aucuns streams trouvés', inline=True)
+        embed.add_field(name="\u200b", value="Aucuns streams trouvés", inline=True)
 
     await ctx.respond(embed=embed)
 
 
 @plugin.command()
-@option('recherche', 'Le titre de la vidéo à rechercher', modifier=OptionModifier.CONSUME_REST)
-@command('youtube', 'Recherche une vidéo youtube')
+@option("recherche", "Le titre de la vidéo à rechercher", modifier=OptionModifier.CONSUME_REST,)
+@command("youtube", "Recherche une vidéo youtube")
 @implements(SlashCommand)
 async def youtube(ctx: Context):
-    url = (YoutubeDL({'format': 'bestaudio/best', 'noplaylist': 'True', 'quiet': 'True'})
-            .extract_info(f"ytsearch:{ctx.options.recherche}", download=False)['entries'][0]['webpage_url'])
+    with YoutubeDL({"format": "bestaudio/best", "noplaylist": "True", "quiet": "True"}) as ydl:
+        url = ydl.extract_info(f"ytsearch:{ctx.options.recherche}", download=False)["entries"][0]["webpage_url"]
 
     await ctx.respond(url)
 
 
 @plugin.command()
-@option('recherche', "Le nom de l'article Wikipedia", modifier=OptionModifier.CONSUME_REST)
-@command('wikipedia', 'Rechercher des articles wikipedia')
+@option("recherche", "Le nom de l'article Wikipedia", modifier=OptionModifier.CONSUME_REST)
+@command("wikipedia", "Rechercher des articles wikipedia")
 @implements(SlashCommand)
 async def wikipedia(ctx: Context):
-    query = f'https://fr.wikipedia.org/w/api.php?action=opensearch&search={ctx.options.recherche}&namespace=0&limit=1'
+    query = f"https://fr.wikipedia.org/w/api.php?action=opensearch&search={ctx.options.recherche}&namespace=0&limit=1"
     resp = list(await api_call(query))
     title, url = resp[1][0], resp[3][0]
 
-    query = f'https://fr.wikipedia.org/w/api.php?format=json&action=query&prop=extracts|pageimages&exintro&explaintext&redirects=1&titles={title}'
-    resp = dict(await api_call(query))['query']['pages']
+    query = f"https://fr.wikipedia.org/w/api.php?format=json&action=query&prop=extracts|pageimages&exintro&explaintext&redirects=1&titles={title}"
+    resp = dict(await api_call(query))["query"]["pages"]
     data = next(iter(resp.values()))
-    desc = f"{data['extract']} [Lire l'article]({url})"
 
-    embed = (Embed(color=0x546e7a, description=desc)
-                .set_author(name=f'Wikipedia - {title}', icon='https://i.imgur.com/nDTQgbf.png')
-                .set_thumbnail(data['thumbnail']['source'] if 'thumbnail' in data.keys() else ''))
+    desc = f"{data['extract']} [Lire l'article]({url})"
+    thumbnail = data["thumbnail"]["source"] if "thumbnail" in data.keys() else ""
+
+    embed = (
+        Embed(color=0x546E7A, description=desc)
+        .set_author(name=f"Wikipedia - {title}", icon="https://i.imgur.com/nDTQgbf.png")
+        .set_thumbnail(thumbnail)
+    )
 
     await ctx.respond(embed=embed)
 
 
 @plugin.command()
-@option('anime', "Le nom de l'anime dont tu veux les informations", modifier=OptionModifier.CONSUME_REST)
-@command('anime', 'Rechercher des animes')
+@option("anime", "Le nom de l'anime dont tu veux les informations", modifier=OptionModifier.CONSUME_REST,)
+@command("anime", "Rechercher des animes")
 @implements(SlashCommand)
 async def anime(ctx: Context):
-    resp = (await api_call(f'https://kitsu.io/api/edge/anime?filter[text]={ctx.options.anime}'))['data'][0]
-    anime = resp['attributes']
+    resp = await api_call(f"https://kitsu.io/api/edge/anime?filter[text]={ctx.options.anime}")
+    data = resp["data"][0]
+    anime = data["attributes"]
 
-    end = datetime.strptime(anime['endDate'], '%Y-%m-%d').strftime('%d/%m/%Y') if anime['endDate'] else 'En cours'
-    ep = f"{anime['episodeCount']} épisodes" if anime['episodeCount'] else 'En cours'
-    h, m = divmod(int(anime['totalLength']), 60)
+    end = (
+        datetime.strptime(anime["endDate"], "%Y-%m-%d").strftime("%d/%m/%Y")
+        if anime["endDate"]
+        else "En cours"
+    )
+    ep = f"{anime['episodeCount']} épisodes" if anime["episodeCount"] else "En cours"
+    h, m = divmod(int(anime["totalLength"]), 60)
 
     diff = f"{datetime.strptime(anime['startDate'], '%Y-%m-%d').strftime('%d/%m/%Y')} → {end}"
 
-    embed = (Embed(color=0x546e7a, description=anime['synopsis'])
-                .add_field(name='🥇 Score', value=f"{anime['averageRating']}/100", inline=True)
-                .add_field(name='🖥️ Épisodes', value=f"{ep} ({h:d}h{m:02d}min)", inline=True)
-                .add_field(name='📅 Diffusion', value=diff, inline=True)
-                .set_author(name=f"Anime - {anime['titles']['en_jp']}", icon=anime['posterImage']['tiny']))
+    embed = (
+        Embed(color=0x546E7A, description=anime["synopsis"])
+        .add_field(name="🥇 Score", value=f"{anime['averageRating']}/100", inline=True)
+        .add_field(name="🖥️ Épisodes", value=f"{ep} ({h:d}h{m:02d}min)", inline=True)
+        .add_field(name="📅 Diffusion", value=diff, inline=True)
+        .set_author(name=f"Anime - {anime['titles']['en_jp']}", icon=anime["posterImage"]["tiny"])
+    )
 
     await ctx.respond(embed=embed)
 
 
 @plugin.command()
-@option('ville', 'Le nom de la ville dont tu veux la météo', modifier=OptionModifier.CONSUME_REST)
-@command('meteo', "Donne la météo d'une ville sur un jour")
+@option("ville", "Le nom de la ville dont tu veux la météo", modifier=OptionModifier.CONSUME_REST)
+@command("meteo", "Donne la météo d'une ville sur un jour")
 @implements(SlashCommand)
 async def meteo(ctx: Context):
     query = f"https://api.openweathermap.org/data/2.5/forecast?q={ctx.options.ville}&units=metric&APPID={environ['WEATHER_TOKEN']}"
     resp = await api_call(query)
-    today, now = resp['list'][0], datetime.now()
-    info = {'wind': f"{today['wind']['speed']} km/h",
-            'humidity': f"{today['main']['humidity']} %",
-            'rain': f"{round(today['rain']['3h']/3, 2)} mm/h" if 'rain' in today.keys() else '0 mm/h',
-            'ID': today['weather'][0]['icon'] + '.png'}
+    today, now = resp["list"][0], datetime.now()
+    info = {
+        "wind": f"{today['wind']['speed']} km/h",
+        "humidity": f"{today['main']['humidity']} %",
+        "ID": f'{today["weather"][0]["icon"]}.png',
+        "rain": f"{round(today['rain']['3h']/3, 2)} mm/h" if "rain" in today.keys() else "0 mm/h",
+    }
 
-    data = {entry['dt_txt'][:10]: [] for entry in resp['list']}
-    for entry in resp['list']:
-        temp = [entry['dt_txt'][11:-6]+'h', entry['main']['temp']]
-        data[entry['dt_txt'][:10]].append(temp)
+    data = {entry["dt_txt"][:10]: [] for entry in resp["list"]}
+    for entry in resp["list"]:
+        temp = [entry["dt_txt"][11:-6] + "h", entry["main"]["temp"]]
+        data[entry["dt_txt"][:10]].append(temp)
 
-    days = [now.strftime('%Y-%m-%d'), (now + timedelta(hours=24)).strftime('%Y-%m-%d')]
+    days = [now.strftime("%Y-%m-%d"), (now + timedelta(hours=24)).strftime("%Y-%m-%d")]
     data = [item for d, l in data.items() if d in days for item in l]
     hours, temps = [], []
 
@@ -126,30 +152,32 @@ async def meteo(ctx: Context):
             temps.append(hour[1])
 
     fig, ax = plt.subplots()
-    ax.plot(hours, temps, color='#feca57', marker='o', lw=2, ls='--')
+    ax.plot(hours, temps, color="#feca57", marker="o", lw=2, ls="--")
 
     ax.grid()
-    ax.fill_between(hours, 0, temps, alpha=.3, color='#1dd1a1')
+    ax.fill_between(hours, 0, temps, alpha=0.3, color="#1dd1a1")
     ax.set(xlim=(0, len(hours) - 1), ylim=(0, None), xticks=hours)
-    ax.tick_params(axis='x', colors='white', pad=5)
-    ax.tick_params(axis='y', colors='white')
-    ax.spines['bottom'].set_color('white')
-    ax.spines['top'].set_color('#2F3136')
-    ax.spines['right'].set_color('#2F3136')
-    ax.spines['left'].set_color('white')
-    ax.set_facecolor('#2F3136')
-    fig.patch.set_facecolor('#2F3136')
+    ax.tick_params(axis="x", colors="white", pad=5)
+    ax.tick_params(axis="y", colors="white")
+    ax.spines["bottom"].set_color("white")
+    ax.spines["top"].set_color("#2F3136")
+    ax.spines["right"].set_color("#2F3136")
+    ax.spines["left"].set_color("white")
+    ax.set_facecolor("#2F3136")
+    fig.patch.set_facecolor("#2F3136")
 
     stream = BytesIO()
-    plt.savefig(stream, bbox_inches='tight')
+    plt.savefig(stream, bbox_inches="tight")
     stream.seek(0)
 
-    embed = (Embed(title=f"🌦️ Prévisions météo à {ctx.options.ville.title()}", color=0x3498db)
-                .add_field(name='\u200b', value=f"Vent : {info['wind']}", inline=True)
-                .add_field(name='\u200b', value=f"Humidité : {info['humidity']}", inline=True)
-                .add_field(name='\u200b', value=f"Pluie : {info['rain']}", inline=True)
-                .set_image(stream)
-                .set_thumbnail('https://openweathermap.org/img/w/' + info['ID']))
+    embed = (
+        Embed(title=f"🌦️ Prévisions météo à {ctx.options.ville.title()}", color=0x3498DB)
+        .add_field(name="\u200b", value=f"Vent : {info['wind']}", inline=True)
+        .add_field(name="\u200b", value=f"Humidité : {info['humidity']}", inline=True)
+        .add_field(name="\u200b", value=f"Pluie : {info['rain']}", inline=True)
+        .set_image(stream)
+        .set_thumbnail("https://openweathermap.org/img/w/" + info["ID"])
+    )
 
     await ctx.respond(embed=embed)
 
