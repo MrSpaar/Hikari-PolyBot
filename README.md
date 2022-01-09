@@ -8,21 +8,21 @@ PolyBot est **un bot discord multi-fonction**. Pour l'instant, il est **semi-pri
 
 |                                            Categorie                                            |                         Commandes                       |
 |-------------------------------------------------------------------------------------------------|---------------------------------------------------------|
-|[Fun](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/fun.py)                      | `chess` `hangman` `minesweeper` `toss` `roll` `reaction`|
-|[Musique](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/music.py)                | `play` `stop` `skip` `pause` `resume`                   |
-|[Recherche](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/search.py)             | `twitch` `youtube` `wikipedia` `anime` `weather`        |
+|[Fun](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/fun.py)                      | `chess` `pendu` `demineur` `coinflip` `roll` `reaction` |
+|[Musique](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/music.py)                | `play` `leave` `skip` `pause` `resume`                  |
+|[Recherche](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/search.py)             | `twitch` `youtube` `wikipedia` `anime` `meteo`          |
 |[Divers](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/misc.py)                  | `help` `poll` `pfp` `emoji` `repo` `code`               |
-|[Maths](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/maths.py)                  | `base` `binary` `hexadecimal` `calcul`                  |
+|[Maths](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/maths.py)                  | `base` `binaire` `hexa` `calcul`                        |
 |[Niveaux](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/levels.py)               | `rank` `levels`                                         |
-|[Channels Temporaires](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/channels.py)| `voc rename` `voc private` `voc owner`                  |
+|[Channels Temporaires](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/channels.py)| `rename` `private` `owner`                              |
 
 ### • 🔒 Commandes admin
 
 |                                        Categorie                                        |                                  Commandes                                |
 |-----------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
-|[Modération](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/moderation.py)| `clear` `kick` `ban` `unban`                              |
+|[Modération](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/moderation.py)| `clear` `kick` `ban` `unban`                                              |
 |[Infos](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/informations.py)   | `serverinfo` `userinfo` `roleinfo`                                        |
-|[Menus](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/utility.py)        | `menu boutons` `menu liste` `menu emojis`                                 |
+|[Menus](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/utility.py)        | `menu`                                                                    |
 |[Setup](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/setup.py)          | `set` `settings`                                                          |
 
 # Modules supplémentaires
