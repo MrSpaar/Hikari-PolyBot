@@ -180,7 +180,7 @@ async def meteo(ctx: Context):
     )
 
     await ctx.respond("\u200b")
-    await ctx.get_channel().send(embed=embed)
+    await ctx.edit_last_response(embed=embed)
 
 
 def load(bot):
