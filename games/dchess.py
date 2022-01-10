@@ -54,7 +54,8 @@ class Chess:
                              icon=self.opponent.avatar_url))
 
         if self.message:
-            await self.message.edit(embed=embed)
+            await self.message.delete()
+            self.message = await self.channel.send(embed=embed)
         else:
             self.message = await self.ctx.edit_last_response(embed=embed)
 

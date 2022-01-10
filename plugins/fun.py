@@ -27,13 +27,11 @@ plugin = Plugin("Jeux")
 @command("chess", "Jouer aux échecs contre quelqu'un")
 @implements(SlashCommand)
 async def chess(ctx: Context):
-    await ctx.respond("Commande en cours de développement")
+    if ctx.options.membre.is_bot or ctx.options.membre == ctx.member:
+        return await ctx.respond("Tu ne peux pas jouer contre un bot ou contre toi-même")
 
-    # if ctx.options.membre.is_bot or ctx.options.membre == ctx.member:
-    #     return await ctx.respond("Tu ne peux pas jouer contre un bot ou contre toi-même")
-
-    # await ctx.respond("\u200b")
-    # await Chess(ctx).start()
+    await ctx.respond("\u200b")
+    await Chess(ctx).start()
 
 
 @plugin.command()
