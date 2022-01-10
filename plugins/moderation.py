@@ -1,4 +1,4 @@
-from hikari import Member, Embed, Permissions, GatewayGuild
+from hikari import Member, Embed, Permissions, GatewayGuild, MessageFlag
 from lightbulb import (
     Plugin,
     Context,
@@ -40,6 +40,7 @@ async def clear(ctx: Context):
         messages += [message]
 
     await channel.delete_messages(messages)
+    await ctx.respond(f'{ctx.options.x} message supprimés', flags=MessageFlag.EPHEMERAL)
 
 
 @plugin.command()
