@@ -21,7 +21,7 @@ class Chess:
 
 
     async def start(self) -> None:
-        await self.send_message(init=True)
+        await self.edit_message(init=True)
         await self.message.add_reaction('✅')
         await self.message.add_reaction('❌')
 
@@ -29,20 +29,18 @@ class Chess:
             event = await self.ctx.bot.wait_for(GuildReactionAddEvent, timeout=300,
                                             predicate=lambda e: e.emoji_name in ['✅', '❌'] and e.member.id == self.opponent.id)
         except:
-            return await self.send_message(color=0xe74c3c, text="❌ L'adversaire n'a pas accepté la partie à temps")
+            return await self.edit_message(color=0xe74c3c, text="❌ L'adversaire n'a pas accepté la partie à temps")
 
+        await self.message.remove_all_reactions()
 
         if str(event.emoji_name) == '❌':
-            return await self.send_message(color=0xe74c3c, text="❌ L'adversaire à refusé la partie")
+            return await self.edit_message(color=0xe74c3c, text="❌ L'adversaire à refusé la partie")
 
-        await self.send_message(color=0xfffff)
+        await self.edit_message(color=0xfffff)
         return await self.play()
 
 
-    async def send_message(self, move: Move = None, color=0x00000, text: str = '', init: bool = False) -> None:
-        if self.message:
-            await self.message.delete()
-
+    async def edit_message(self, move: Move = None, color=0x00000, text: str = '', init: bool = False) -> None:
         board_bytes = board(self.board, lastmove=move) if move else board(self.board)
         board_bytes = svg2png(bytestring=board_bytes, write_to=None)
 
@@ -55,7 +53,10 @@ class Chess:
                  .set_author(name=f'{self.opponent.username} contre {self.ctx.author.username}',
                              icon=self.opponent.avatar_url))
 
-        self.message = await self.channel.send(embed=embed)
+        if self.message:
+            await self.message.edit(embed=embed)
+        else:
+            self.message = await self.ctx.edit_last_response(embed=embed)
 
 
     async def play(self) -> None:
@@ -69,10 +70,10 @@ class Chess:
                 m = self.board.parse_san(event.message.content)
                 self.board.push(m)
             except:
-                await self.turn()
+                await self.play()
             else:
                 await event.message.delete()
-                await self.send_message(m, 0xfffff)
+                await self.edit_message(m, 0xfffff)
         except TimeoutError:
             return await self.ctx.respond(f'Temps de réflexion écoulé, {self.cur[1].mention} a gagné')
 
