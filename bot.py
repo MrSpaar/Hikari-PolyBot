@@ -1,4 +1,4 @@
-from hikari import StartedEvent
+from hikari import StartedEvent, Activity
 
 from core.cls import Bot
 
@@ -6,9 +6,9 @@ bot = Bot()
 
 
 @bot.listen(StartedEvent)
-async def set_status(_):
+async def ready(_):
     print("Bot is ready")
 
 
 bot.load_extensions_from("./plugins/")
-bot.run()
+bot.run(activity=Activity(name='vous observer', type=0))

@@ -1,4 +1,4 @@
-from hikari import Intents, Member, GatewayBot, Color
+from hikari import Intents, Member, GatewayBot
 from lightbulb import BotApp
 
 from os import environ
@@ -10,11 +10,11 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 
 class Bot(BotApp):
-    def __init__(self):
+    def __init__(self, debug: bool = False):
         load_dotenv()
         super().__init__(
             intents=Intents.ALL,
-            token=environ["BOT_TOKEN"],
+            token=environ["DEBUG_TOKEN"] if debug else environ["BOT_TOKEN"],
             logs="ERROR",
             default_enabled_guilds=[],
         )
