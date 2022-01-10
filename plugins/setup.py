@@ -69,7 +69,7 @@ async def on_guild_join(event):
         }
     )
 
-    for member in filter(lambda m: not m.bot, guild.members):
+    for member in filter(lambda m: not m.bot, guild.get_members()):
         await plugin.bot.db.members.update(
             {"_id": member.id},
             {"$addToSet": {"guilds": {"id": guild.id, "level": 0, "xp": 0}}},
@@ -83,7 +83,7 @@ async def on_guild_remove(event):
         guild = event.get_guild()
         await plugin.bot.db.setup.delete({"_id": guild.id})
         await plugin.bot.db.members.collection.update_many(
-            {"_id": {"$in": [member.id for member in guild.members]}},
+            {"_id": {"$in": [member.id for member in guild.get_members()]}},
             {"$pull": {"guilds": {"id": guild.id}}},
         )
     except:
