@@ -34,7 +34,7 @@ async def fetch_settings(guild: GatewayGuild):
 async def clear(ctx: Context):
     channel, messages = ctx.get_channel(), []
     async for message in channel.fetch_history():
-        if len(messages) > ctx.options.x:
+        if len(messages) >= ctx.options.x:
             break
 
         messages += [message]
