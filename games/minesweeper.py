@@ -2,13 +2,11 @@ from hikari import Message, InteractionCreateEvent
 from hikari.impl import ActionRowBuilder
 from lightbulb import Context
 
-from core.cls import Bot
 from random import sample, randint
 
 
 class Minesweeper:
     def __init__(self, ctx):
-        self.bot: Bot = ctx.bot
         self.ctx: Context = ctx
         self.messages: Message = []
 
@@ -33,5 +31,5 @@ class Minesweeper:
         await self.loop()
 
     async def loop(self):
-        event = await self.bot.wait_for(InteractionCreateEvent, timeout=120, predicate=lambda e: e.interaction.member.id == self.ctx.member.id)
+        event = await self.ctx.bot.wait_for(InteractionCreateEvent, timeout=120, predicate=lambda e: e.interaction.member.id == self.ctx.member.id)
         await event.interaction.create_initial_response(4, 'OUI', flags=1 << 6)

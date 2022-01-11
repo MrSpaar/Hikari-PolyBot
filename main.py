@@ -1,8 +1,8 @@
 from hikari import StartedEvent, Activity
 
-from core.cls import Bot
+from src.bot import Bot
 
-bot = Bot()
+bot = Bot(True)
 
 
 @bot.listen(StartedEvent)

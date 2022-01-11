@@ -1,4 +1,4 @@
-from hikari import Member, Embed, Permissions, GatewayGuild, MessageFlag
+from hikari import Member, Embed, Permissions, MessageFlag
 from lightbulb import (
     Plugin,
     Context,
@@ -12,18 +12,10 @@ from lightbulb import (
     has_guild_permissions,
 )
 
-from core.funcs import is_higher
+from src.funcs import is_higher
 
 plugin = Plugin("Moderation")
 plugin.add_checks(guild_only)
-
-
-async def fetch_settings(guild: GatewayGuild):
-    settings = await plugin.bot.db.setup.find({"_id": guild.id})
-    role = guild.get_role(settings["mute"])
-    logs = guild.get_channel(settings["logs"])
-
-    return role, logs
 
 
 @plugin.command()

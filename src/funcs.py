@@ -39,25 +39,4 @@ def _is_higher(ctx: Context):
     raise errors.MissingRequiredPermission(Permissions.ADMINISTRATOR)
 
 
-async def _vc_check(ctx: Context):
-    guild = ctx.get_guild()
-    voice = guild.get_voice_state(ctx.author)
-
-    if not voice:
-        raise errors.CommandInvocationError("channel")
-
-    entry = await ctx.bot.db.pending.find(
-        {"guild_id": guild.id, "voc_id": guild.get_channel(voice.channel_id).id}
-    )
-    if not entry:
-        raise errors.CommandInvocationError("Not Temp")
-
-    owner = guild.get_member(entry["owner"])
-    if ctx.author != owner:
-        raise errors.CommandInvocationError("Not owner")
-
-    return True
-
-
-vc_check = Check(_vc_check)
 is_higher = Check(_is_higher)

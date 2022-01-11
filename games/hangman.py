@@ -1,14 +1,12 @@
 from hikari import Embed, Message, MessageCreateEvent
 from lightbulb import Context
 
-from core.cls import Bot
 from random import choice, randint
-from core.funcs import normalize_string
+from src.funcs import normalize_string
 
 
 class Hangman:
     def __init__(self, ctx):
-        self.bot: Bot = ctx.bot
         self.ctx: Context = ctx
         self.message: Message = None
         self.embed: Embed = None
@@ -28,8 +26,8 @@ class Hangman:
         await self.play()
 
     async def get_letter(self) -> str:
-        event = await self.bot.wait_for(MessageCreateEvent, timeout=None,
-                                        predicate=lambda m: m.author == self.ctx.author and len(m.content) in [1, len(self.word)])
+        event = await self.ctx.bot.wait_for(MessageCreateEvent, timeout=None,
+                                            predicate=lambda m: m.author == self.ctx.author and len(m.content) in [1, len(self.word)])
         await event.message.delete()
         return normalize_string(event.message.content.lower())
 

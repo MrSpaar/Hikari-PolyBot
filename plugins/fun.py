@@ -13,7 +13,7 @@ from lightbulb import (
 
 from games.minesweeper import Minesweeper
 from games.hangman import Hangman
-from games.dchess import Chess
+from games.chess import Chess
 from random import randint, choice
 from datetime import datetime
 from asyncio import sleep

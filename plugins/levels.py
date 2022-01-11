@@ -15,8 +15,7 @@ from lightbulb import (
     guild_only,
 )
 
-from core.cls import Cooldown
-from random import randint
+from src.cooldown import Cooldown
 
 cd = Cooldown(1, 60)
 plugin = Plugin("Niveaux")
@@ -61,10 +60,10 @@ def get_page(guild: GatewayGuild, entries: dict):
 @command("rank", "Afficher le niveau d'un membre")
 @implements(SlashCommand)
 async def rank(ctx: Context):
-    member, guild = ctx.options.membre or ctx.member, ctx.get_guild()
-    data = await plugin.bot.db.members.sort(
-        {"guilds.id": guild.id}, {"guilds.$": 1}, "guilds.xp", -1
-    )
+    guild = ctx.get_guild()
+    member = ctx.options.membre or ctx.member
+
+    data = await plugin.bot.db.fetch_leaderboard(guild.id)
     data = {
         entry["_id"]: entry["guilds"][0] | {"pos": i + 1}
         for i, entry in enumerate(data)
@@ -91,9 +90,7 @@ async def levels(ctx: Context):
         .set_footer(text="Page 1")
     )
 
-    data = await plugin.bot.db.members.sort(
-        {"guilds.id": 752921557214429316}, {"guilds.$": 1}, "guilds.xp", -1
-    )
+    data = await plugin.bot.db.fetch_leaderboard(guild.id)
     data = {
         entry["_id"]: entry["guilds"][0] | {"pos": i + 1}
         for i, entry in enumerate(data[:10])
@@ -124,9 +121,7 @@ async def on_reaction_add(event):
     ):
         return
 
-    data = await plugin.bot.db.members.sort(
-        {"guilds.id": 752921557214429316}, {"guilds.$": 1}, "guilds.xp", -1
-    )
+    data = await plugin.bot.db.fetch_leaderboard(guild.id)
 
     embed, total = message.embeds[0], len(data) // 10 + (len(data) % 10 > 0)
     inc = -1 if event.emoji_name == "◀️" else 1
@@ -157,28 +152,19 @@ async def on_message(event):
     if not cd.update_cooldown(member, guild):
         return
 
-    entry = await plugin.bot.db.members.find(
-        {"guilds.id": guild.id, "_id": member.id}, {"guilds.$": 1}
-    )
-
+    entry = await plugin.bot.db.fetch_member(guild.id, member.id)
     if not entry:
         return
 
     xp, lvl = entry["guilds"][0]["xp"], entry["guilds"][0]["level"] + 1
     next_lvl = 5 / 6 * lvl * (2 * lvl ** 2 + 27 * lvl + 91)
 
-    await plugin.bot.db.members.update(
-        {"guilds.id": guild.id, "_id": member.id},
-        {"$inc": {
-            "guilds.$.xp": randint(15, 25),
-            "guilds.$.level": 1 if xp >= next_lvl else 0,}
-        },
-    )
+    await plugin.bot.db.update_member_xp(guild.id, member.id, xp, next_lvl)
 
     if next_lvl > xp:
         return
 
-    settings = await plugin.bot.db.setup.find({"_id": guild.id})
+    settings = await plugin.bot.db.fetch_settings(guild.id)
     channel = guild.get_channel(settings["channel"])
 
     if channel:

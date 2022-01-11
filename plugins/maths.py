@@ -9,7 +9,7 @@ from lightbulb import (
     implements,
 )
 
-from core.funcs import api_call
+from src.funcs import api_call
 
 plugin = Plugin("Mathematiques")
 
