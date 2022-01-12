@@ -159,7 +159,7 @@ async def on_message_delete(event):
     else:
         emoji, color = "🗑️", 0xF1C40F
 
-    embeds = [Embed(color=color,description=f"{emoji} Message de {message.author.mention} supprimé dans {channel.mention}:",)]
+    embeds = [Embed(color=color,description=f"{emoji} Message de {message.author.mention} supprimé dans {channel.mention}",)]
 
     if message.content:
         embeds[0].description += f"\n\n> {message.content}"
