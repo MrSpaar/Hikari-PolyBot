@@ -50,7 +50,7 @@ async def on_member_remove(event):
     name = f"{member.display_name} ({member})" if member.display_name else str(member)
 
     embed = Embed(color=0xE74C3C, description=f":outbox_tray: {name} a quitté le serveur")
-    await send_log(guild, embed)
+    await send_log(guild, [embed])
 
 
 @plugin.listener(events.BanCreateEvent)
@@ -65,7 +65,7 @@ async def on_member_ban(event):
     reason, user = entry.reason, guild.get_member(entry.user_id)
 
     embed = Embed(color=0xE74C3C, description=f"👨‍⚖️ {user.mention} a ban {target.mention}\n❔ Raison : {reason or 'Pas de raison'}",)
-    await send_log(guild, embed)
+    await send_log(guild, [embed])
 
 
 @plugin.listener(events.BanDeleteEvent)
@@ -121,7 +121,7 @@ async def on_member_update(event):
     else:
         return
 
-    await send_log(guild, embed)
+    await send_log(guild, [embed])
 
 
 @plugin.listener(events.GuildMessageDeleteEvent)
@@ -190,7 +190,7 @@ async def on_invite_create(event):
     )
 
     embed = Embed(color=0x3498DB, description=f"✉️ {invite.inviter.mention} a créé une [invitation]({url}) qui expire {expire}, utilisable {uses}",)
-    await send_log(guild, embed)
+    await send_log(guild, [embed])
 
 
 def load(bot):
