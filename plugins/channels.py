@@ -16,7 +16,7 @@ async def channel_create(event):
     after = guild.get_channel(event.state.channel_id)
     entry = await plugin.bot.db.fetch_temp_channel(guild.id, member_id=member.id)
 
-    if "CréeT" not in after.name or member.is_bot or entry:
+    if "Créer" not in after.name or member.is_bot or entry:
         return
 
     if category := guild.get_channel(after.parent_id):
