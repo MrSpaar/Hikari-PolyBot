@@ -1,6 +1,7 @@
 from hikari import (
-    Snowflake,
+    Role,
     Embed,
+    TextableGuildChannel,
     Permissions,
     GuildJoinEvent,
     GuildLeaveEvent,
@@ -11,6 +12,8 @@ from lightbulb import (
     Plugin,
     Context,
     SlashCommand,
+    SlashCommandGroup,
+    SlashSubCommand,
     command,
     option,
     implements,
@@ -23,20 +26,42 @@ plugin.add_checks(guild_only, has_guild_permissions(Permissions.ADMINISTRATOR))
 
 
 @plugin.command()
-@option("valeur", "La nouvelle valeur du paramètre (role ou channel)", Snowflake)
-@option("reglage", "Le paramètre à modifier (logs, channel, new)", choices=['new', 'logs', 'channel'])
 @command("set", "Modifier les paramètres du bot")
-@implements(SlashCommand)
-async def _set(ctx: Context):
-    settings = {
-        "new": "Rôle des muets",
-        "logs": "Channel de logs",
-        "channel": "Channel du bot",
-    }
+@implements(SlashCommandGroup)
+async def set_cmd(ctx: Context):
+    pass
 
-    await ctx.bot.db.change_setting(ctx.guild_id, ctx.options.reglage, ctx.options.valeur.id)
 
-    embed = Embed(color=0x2ECC71, description=f"{settings[ctx.options.reglage]} modifié ({ctx.options.valeur.mention})")
+@set_cmd.child
+@option("role", "Le rôle qu'auront les nouveaux membres", Role)
+@command("new", "Modifier le role des nouveaux")
+@implements(SlashSubCommand)
+async def new(ctx: Context):
+    await ctx.bot.db.change_setting(ctx.guild_id, "new", ctx.options.role.id)
+
+    embed = Embed(color=0x2ECC71, description=f"Rôle des nouveaux modifié (<@&{ctx.options.role.id}>)")
+    await ctx.respond(embed=embed)
+
+
+@set_cmd.child
+@option("channel", "Le salon où seront envoyés les logs", TextableGuildChannel)
+@command("logs", "Modifier le channel des logs")
+@implements(SlashSubCommand)
+async def logs(ctx: Context):
+    await ctx.bot.db.change_setting(ctx.guild_id, "logs", ctx.options.channel.id)
+
+    embed = Embed(color=0x2ECC71, description=f"Channel des logs modifié (<#{ctx.options.channel.id}>)")
+    await ctx.respond(embed=embed)
+
+
+@set_cmd.child
+@option("channel", "Le salon où seront envoyés les annonces de level up", TextableGuildChannel)
+@command("niveaux", "Modifier le channel des annonces de level up")
+@implements(SlashSubCommand)
+async def logs(ctx: Context):
+    await ctx.bot.db.change_setting(ctx.guild_id, "channel", ctx.options.channel.id)
+
+    embed = Embed(color=0x2ECC71, description=f"Channel des annonces de level up modifié (<#{ctx.options.channel.id}>)")
     await ctx.respond(embed=embed)
 
 
