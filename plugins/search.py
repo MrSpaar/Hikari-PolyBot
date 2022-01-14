@@ -12,7 +12,6 @@ from lightbulb import (
 
 from src.funcs import api_call
 from datetime import datetime, timedelta
-from yt_dlp import YoutubeDL
 import matplotlib.pyplot as plt
 from io import BytesIO
 from os import environ
