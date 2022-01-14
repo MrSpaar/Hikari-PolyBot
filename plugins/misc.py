@@ -66,19 +66,5 @@ async def emoji(ctx: Context):
     await ctx.respond(embed=embed)
 
 
-@plugin.command()
-@command("repo", "Envoyer le lien vers le code source du bot")
-@implements(SlashCommand)
-async def repo(ctx: Context):
-    await ctx.respond("https://github.com/MrSpaar/PolyBot")
-
-
-@plugin.command()
-@command("code", "Afficher le format pour envoyer du code")
-@implements(SlashCommand)
-async def code(ctx: Context):
-    await ctx.respond("\`\`\`py\nTon code\n\`\`\`")
-
-
 def load(bot):
     bot.add_plugin(plugin)
