@@ -27,7 +27,7 @@ async def search(ctx: Context):
     pass
 
 
-@plugin.command()
+@search.child
 @option("recherche", "Les mots-clés pour affiner la recherche", modifier=OptionModifier.GREEDY)
 @option("categorie", "La catégorie dans laquelle rechercher des streams")
 @command("twitch", "Rechercher des streams Twitch")
@@ -64,7 +64,7 @@ async def twitch(ctx: Context):
     await ctx.respond(embed=embed)
 
 
-@plugin.command()
+@search.child
 @option("recherche", "Le titre de la vidéo à rechercher", modifier=OptionModifier.CONSUME_REST,)
 @command("youtube", "Recherche une vidéo youtube")
 @implements(SlashSubCommand)
@@ -75,7 +75,7 @@ async def youtube(ctx: Context):
     await ctx.respond(url)
 
 
-@plugin.command()
+@search.child
 @option("recherche", "Le nom de l'article Wikipedia", modifier=OptionModifier.CONSUME_REST)
 @command("wikipedia", "Rechercher des articles wikipedia")
 @implements(SlashSubCommand)
@@ -100,7 +100,7 @@ async def wikipedia(ctx: Context):
     await ctx.respond(embed=embed)
 
 
-@plugin.command()
+@search.child
 @option("anime", "Le nom de l'anime dont tu veux les informations", modifier=OptionModifier.CONSUME_REST,)
 @command("anime", "Rechercher des animes")
 @implements(SlashSubCommand)
@@ -130,7 +130,7 @@ async def anime(ctx: Context):
     await ctx.respond(embed=embed)
 
 
-@plugin.command()
+@search.child
 @option("ville", "Le nom de la ville dont tu veux la météo", modifier=OptionModifier.CONSUME_REST)
 @command("meteo", "Donne la météo d'une ville sur un jour")
 @implements(SlashSubCommand)
