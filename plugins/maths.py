@@ -46,15 +46,20 @@ async def calcul(ctx: Context):
 @math.child
 @option("base_arrivee", "La base du nombre à convertir", int)
 @option("base_initiale", "La base du nombre converti", int)
-@option("nombre", "Le nombre à convertir")
+@option("nombre", "Le nombre à convertir", int)
 @command("base", "Convertir un nombre d'une base à une autre base (base 62 maximum)")
 @implements(SlashSubCommand)
 async def base(ctx: Context):
     if ctx.options.base_initiale > 62 or ctx.options.base_arrivee > 62:
         return await ctx.respond("❌ Base trop grande (base 52 maximum)")
 
-    conv = base_conv(ctx.options.nombre, ctx.options.base_initiale, ctx.options.base_arrivee)
-    embed = Embed(color=0x3498DB, description=f"⚙️ `{ctx.options.nombre}` en base {ctx.options.base_arrivee} : `{conv}`")
+    try:
+        conv = base_conv(ctx.options.nombre, ctx.options.base_initiale, ctx.options.base_arrivee)
+    except:
+        embed = Embed(color=0xE74C3C, description="❌ Erreur dans la conversion")
+    else:
+        embed = Embed(color=0x3498DB, description=f"⚙️ `{ctx.options.nombre}` en base {ctx.options.base_arrivee} : `{conv}`")
+
     await ctx.respond(embed=embed)
 
 
