@@ -1,4 +1,4 @@
-from hikari import Embed
+from hikari import Embed, MessageFlag
 from lightbulb import (
     Plugin,
     Context,
@@ -65,17 +65,6 @@ async def twitch(ctx: Context):
 
 
 @search.child
-@option("recherche", "Le titre de la vidéo à rechercher", modifier=OptionModifier.CONSUME_REST,)
-@command("youtube", "Recherche une vidéo youtube")
-@implements(SlashSubCommand)
-async def youtube(ctx: Context):
-    with YoutubeDL({"format": "bestaudio/best", "noplaylist": "True", "quiet": "True"}) as ydl:
-        url = ydl.extract_info(f"ytsearch:{ctx.options.recherche}", download=False)["entries"][0]["webpage_url"]
-
-    await ctx.respond(url)
-
-
-@search.child
 @option("recherche", "Le nom de l'article Wikipedia", modifier=OptionModifier.CONSUME_REST)
 @command("wikipedia", "Rechercher des articles wikipedia")
 @implements(SlashSubCommand)
@@ -137,6 +126,11 @@ async def anime(ctx: Context):
 async def meteo(ctx: Context):
     query = f"https://api.openweathermap.org/data/2.5/forecast?q={ctx.options.ville}&units=metric&APPID={environ['WEATHER_TOKEN']}"
     resp = await api_call(query)
+
+    if resp["cod"] != '200':
+        embed = Embed(color=0xE74C3C, description="❌ Ville introuvable ou inexistante")
+        return await ctx.respond(embed=embed, flags=MessageFlag.EPHEMERAL)
+
     today, now = resp["list"][0], datetime.now()
     info = {
         "wind": f"{today['wind']['speed']} km/h",

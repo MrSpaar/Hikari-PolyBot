@@ -1,4 +1,4 @@
-from hikari import Permissions, InteractionCreateEvent, GuildMessageCreateEvent
+from hikari import Permissions, InteractionCreateEvent, GuildMessageCreateEvent, MessageFlag
 from hikari.impl import ActionRowBuilder
 from lightbulb import (
     RoleConverter,
@@ -93,9 +93,7 @@ async def on_button_click(event):
         role = guild.get_role(interaction.custom_id)
         await interaction.member.add_role(role)
 
-        return await interaction.create_initial_response(
-            4, f"✅ Rôle {role.mention} ajouté", flags=1 << 6
-        )
+        return await interaction.create_initial_response(4, f"✅ Rôle {role.mention} ajouté", flags=MessageFlag.EPHEMERAL)
 
     role = guild.get_role(int(interaction.values[0]))
     member_roles = interaction.member.get_roles()
@@ -105,14 +103,10 @@ async def on_button_click(event):
     ]
 
     if any([role in member_roles for role in menu_roles]):
-        return await interaction.create_initial_response(
-            4, f"❌ Tu as déjà un des rôles", flags=1 << 6
-        )
+        return await interaction.create_initial_response(4, f"❌ Tu as déjà un des rôles", flags=MessageFlag.EPHEMERAL)
 
     await interaction.member.add_role(role)
-    await interaction.create_initial_response(
-        4, f"✅ Rôle {role.mention} ajouté", flags=1 << 6
-    )
+    await interaction.create_initial_response(4, f"✅ Rôle {role.mention} ajouté", flags=MessageFlag.EPHEMERAL)
 
 
 def load(bot):
