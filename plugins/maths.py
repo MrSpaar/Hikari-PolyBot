@@ -2,7 +2,8 @@ from hikari import Embed
 from lightbulb import (
     Plugin,
     Context,
-    SlashCommand,
+    SlashCommandGroup,
+    SlashSubCommand,
     OptionModifier,
     command,
     option,
@@ -14,6 +15,13 @@ from src.funcs import api_call
 plugin = Plugin("Mathematiques")
 
 
+@plugin.command()
+@command("math", "Groupes de commandes en rapport avec les maths")
+@implements(SlashCommandGroup)
+async def math(ctx: Context):
+    pass
+
+
 def base_conv(k: int, b: int, n: int):
     def to_base(num, b, numerals="0123456789abcdefghijklmnopqrstuvwxyxABCDEFGHIJKLMNOPQRSTUVWXYZ",):
         return ((num == 0) and numerals[0]) or (
@@ -23,10 +31,10 @@ def base_conv(k: int, b: int, n: int):
     return to_base(int(str(k), b), n)
 
 
-@plugin.command()
+@math.child
 @option("calcul", "Le calcul dont tu veux le résultat", modifier=OptionModifier.CONSUME_REST)
 @command("calcul", "Obtenir le résultat d'un calcul")
-@implements(SlashCommand)
+@implements(SlashSubCommand)
 async def calcul(ctx: Context):
     query = ctx.options.calcul.replace("+", "%2B").replace("x", "*")
     result = await api_call(f"https://api.mathjs.org/v4/?expr={query}", json=False)
@@ -35,12 +43,12 @@ async def calcul(ctx: Context):
     await ctx.respond(embed=embed)
 
 
-@plugin.command()
+@math.child
 @option("base_arrivee", "La base du nombre à convertir", int)
 @option("base_initiale", "La base du nombre converti", int)
 @option("nombre", "Le nombre à convertir")
 @command("base", "Convertir un nombre d'une base à une autre base (base 62 maximum)")
-@implements(SlashCommand)
+@implements(SlashSubCommand)
 async def base(ctx: Context):
     if ctx.options.base_initiale > 62 or ctx.options.base_arrivee > 62:
         return await ctx.respond("❌ Base trop grande (base 52 maximum)")
@@ -50,10 +58,10 @@ async def base(ctx: Context):
     await ctx.respond(embed=embed)
 
 
-@plugin.command()
+@math.child
 @option("texte", "Le texte à convertir en binaire", modifier=OptionModifier.CONSUME_REST)
 @command("binaire", description="Convertir du texte en binaire")
-@implements(SlashCommand)
+@implements(SlashSubCommand)
 async def binaire(ctx: Context):
     try:
         conv = [bin(int(ctx.options.texte))[2:]]
@@ -64,10 +72,10 @@ async def binaire(ctx: Context):
     await ctx.respond(embed=embed)
 
 
-@plugin.command()
+@math.child
 @option("texte", "Le texte à convertir en hexadécimal", modifier=OptionModifier.CONSUME_REST)
 @command("hexa", "Convertir du texte en hexadécimal")
-@implements(SlashCommand)
+@implements(SlashSubCommand)
 async def hexa(ctx: Context):
     embed = Embed(color=0x3498DB, description=f"⚙️ `{ctx.options.texte}` = `{ctx.options.texte.encode().hex()}`",)
     await ctx.respond(embed=embed)

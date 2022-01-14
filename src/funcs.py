@@ -23,7 +23,7 @@ def now(utc: bool = False) -> datetime:
     return datetime.utcnow() + timedelta(hours=2)
 
 
-def _is_higher(ctx: Context):
+def _is_higher(ctx: Context) -> Union[bool, Exception]:
     args = ctx.message.content.split()
     guild = ctx.get_guild()
     member = guild.get_member(int(args[1].strip("<@!>")))

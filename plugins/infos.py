@@ -2,7 +2,8 @@ from hikari import Embed, Member, Role, GuildTextChannel, Permissions
 from lightbulb import (
     Plugin,
     Context,
-    SlashCommand,
+    SlashCommandGroup,
+    SlashSubCommand,
     command,
     option,
     implements,
@@ -16,8 +17,15 @@ plugin.add_checks(guild_only)
 
 
 @plugin.command()
-@command("serverinfo", "Afficher des informations à propos du serveur")
-@implements(SlashCommand)
+@command("info", "Groupes de commandes en rapport avec les informations")
+@implements(SlashCommandGroup)
+async def info(ctx: Context):
+    pass
+
+
+@info.child
+@command("server", "Afficher des informations à propos du serveur")
+@implements(SlashSubCommand)
 async def serverinfo(ctx: Context):
     guild = ctx.get_guild()
     channels = guild.get_channels().values()
@@ -47,10 +55,10 @@ async def serverinfo(ctx: Context):
     await ctx.respond(embed=embed)
 
 
-@plugin.command()
+@info.child
 @option("membre", "L'utilisateur dont tu veux voir les informations", Member, default=None)
-@command("userinfo", "Afficher des informations à propos du serveur d'un membre")
-@implements(SlashCommand)
+@command("user", "Afficher des informations à propos du serveur d'un membre")
+@implements(SlashSubCommand)
 async def userinfo(ctx: Context):
     member = ctx.options.membre or ctx.member
 
@@ -102,10 +110,10 @@ async def userinfo(ctx: Context):
     await ctx.respond(embed=embed)
 
 
-@plugin.command()
+@info.child
 @option("role", "Le rôle dont tu veux voir les informations", Role)
-@command("roleinfo", "Afficher des informations à propos du serveur d'un rôle")
-@implements(SlashCommand)
+@command("role", "Afficher des informations à propos du serveur d'un rôle")
+@implements(SlashSubCommand)
 async def roleinfo(ctx: Context):
     role = ctx.options.role
     since = int(mktime(role.created_at.timetuple()))

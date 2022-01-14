@@ -2,7 +2,8 @@ from hikari import Embed
 from lightbulb import (
     Plugin,
     Context,
-    SlashCommand,
+    SlashCommandGroup,
+    SlashSubCommand,
     OptionModifier,
     command,
     option,
@@ -20,10 +21,17 @@ plugin = Plugin("Recherche")
 
 
 @plugin.command()
+@command("recherche", "Groupes de commandes en rapport avec la recherche")
+@implements(SlashCommandGroup)
+async def search(ctx: Context):
+    pass
+
+
+@plugin.command()
 @option("recherche", "Les mots-clés pour affiner la recherche", modifier=OptionModifier.GREEDY)
 @option("categorie", "La catégorie dans laquelle rechercher des streams")
 @command("twitch", "Rechercher des streams Twitch")
-@implements(SlashCommand)
+@implements(SlashSubCommand)
 async def twitch(ctx: Context):
     query = f"https://api.twitch.tv/kraken/search/streams?query={ctx.options.categorie}&limit={100 if ctx.options.recherche else 10}"
 
@@ -59,7 +67,7 @@ async def twitch(ctx: Context):
 @plugin.command()
 @option("recherche", "Le titre de la vidéo à rechercher", modifier=OptionModifier.CONSUME_REST,)
 @command("youtube", "Recherche une vidéo youtube")
-@implements(SlashCommand)
+@implements(SlashSubCommand)
 async def youtube(ctx: Context):
     with YoutubeDL({"format": "bestaudio/best", "noplaylist": "True", "quiet": "True"}) as ydl:
         url = ydl.extract_info(f"ytsearch:{ctx.options.recherche}", download=False)["entries"][0]["webpage_url"]
@@ -70,7 +78,7 @@ async def youtube(ctx: Context):
 @plugin.command()
 @option("recherche", "Le nom de l'article Wikipedia", modifier=OptionModifier.CONSUME_REST)
 @command("wikipedia", "Rechercher des articles wikipedia")
-@implements(SlashCommand)
+@implements(SlashSubCommand)
 async def wikipedia(ctx: Context):
     query = f"https://fr.wikipedia.org/w/api.php?action=opensearch&search={ctx.options.recherche}&namespace=0&limit=1"
     resp = list(await api_call(query))
@@ -95,7 +103,7 @@ async def wikipedia(ctx: Context):
 @plugin.command()
 @option("anime", "Le nom de l'anime dont tu veux les informations", modifier=OptionModifier.CONSUME_REST,)
 @command("anime", "Rechercher des animes")
-@implements(SlashCommand)
+@implements(SlashSubCommand)
 async def anime(ctx: Context):
     resp = await api_call(f"https://kitsu.io/api/edge/anime?filter[text]={ctx.options.anime}")
     data = resp["data"][0]
@@ -125,7 +133,7 @@ async def anime(ctx: Context):
 @plugin.command()
 @option("ville", "Le nom de la ville dont tu veux la météo", modifier=OptionModifier.CONSUME_REST)
 @command("meteo", "Donne la météo d'une ville sur un jour")
-@implements(SlashCommand)
+@implements(SlashSubCommand)
 async def meteo(ctx: Context):
     query = f"https://api.openweathermap.org/data/2.5/forecast?q={ctx.options.ville}&units=metric&APPID={environ['WEATHER_TOKEN']}"
     resp = await api_call(query)

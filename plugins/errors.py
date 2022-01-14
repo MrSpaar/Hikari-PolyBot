@@ -1,27 +1,11 @@
 from hikari import Embed
 from lightbulb import Plugin, CommandErrorEvent, errors
 
-from difflib import get_close_matches as gcm
-
 plugin = Plugin("Erreurs")
 
 
 @plugin.listener(CommandErrorEvent)
 async def on_command_error(event):
-    if not event.context:
-        guild = plugin.bot.cache.get_guild(event.message.guild_id)
-        channel = guild.get_channel(event.message.channel_id)
-
-        closest = gcm(
-            event.message.content.split()[0][1:],
-            [cmd.name for cmd in plugin.bot.commands],
-        )
-
-        embed = Embed(color=0xE74C3C, description=f"❌ Commande inexistante")
-        embed.description += f', peut-être voulais-tu utiliser `{closest[0]}` ?' if closest else '.'
-
-        return await channel.send(embed=embed)
-
     ctx, error = event.context, event.exception
 
     handled = {
