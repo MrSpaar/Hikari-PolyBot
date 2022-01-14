@@ -90,11 +90,11 @@ async def wikipedia(ctx: Context):
 
 
 @search.child
-@option("anime", "Le nom de l'anime dont tu veux les informations", modifier=OptionModifier.CONSUME_REST,)
+@option("nom", "Le nom de l'anime dont tu veux les informations", modifier=OptionModifier.CONSUME_REST,)
 @command("anime", "Rechercher des animes")
 @implements(SlashSubCommand)
 async def anime(ctx: Context):
-    resp = await api_call(f"https://kitsu.io/api/edge/anime?filter[text]={ctx.options.anime}")
+    resp = await api_call(f"https://kitsu.io/api/edge/anime?filter[text]={ctx.options.nom}")
     data = resp["data"][0]
     anime = data["attributes"]
 
