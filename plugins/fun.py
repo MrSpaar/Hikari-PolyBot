@@ -101,14 +101,18 @@ async def coinflip(ctx: Context):
 @command("roll", "Faire une lancer de dés")
 @implements(SlashCommand)
 async def roll(ctx: Context):
-    content = ctx.options.chaine.split("+")
-    rolls = [int(content.pop(i)) for i in range(len(content)) if content[i].isdigit()]
+    try:
+        content = ctx.options.chaine.split("+")
+        rolls = [int(content.pop(i)) for i in range(len(content)) if content[i].isdigit()]
 
-    for elem in content:
-        n, faces = elem.split("d") if elem.split("d")[0] != "" else (1, elem[1:])
-        rolls += [randint(1, int(faces)) for _ in range(int(n))]
+        for elem in content:
+            n, faces = elem.split("d") if elem.split("d")[0] != "" else (1, elem[1:])
+            rolls += [randint(1, int(faces)) for _ in range(int(n))]
 
-    rolls_str = " + ".join([str(n) for n in rolls])
+        rolls_str = " + ".join([str(n) for n in rolls])
+    except:
+        embed = Embed(color=0xE74C3C, description="❌ Lancer invalide")
+        return await ctx.respond(embed=embed)
 
     embed = Embed(
         color=0xF1C40F,
