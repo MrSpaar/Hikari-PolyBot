@@ -1,6 +1,5 @@
 from hikari import Intents
 from lightbulb import BotApp
-from lavasnek_rs import Lavalink
 
 from os import environ
 from src.db import Database
@@ -20,11 +19,5 @@ class Bot(BotApp):
             logs="ERROR",
         )
 
-        self.data = Data()
         self.db = Database()
-        self.owner_id = 201674460393242624
-
-
-class Data:
-    def __init__(self) -> None:
-        self.lavalink: Lavalink = None
+        self.data = type("Data", (), {"lavalink": None})
