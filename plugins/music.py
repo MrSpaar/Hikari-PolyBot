@@ -134,8 +134,10 @@ async def reaction_pressed(event):
         return
 
     node = await plugin.bot.data.lavalink.get_guild_node(event.guild_id)
-    message = await node.get_data()
+    if not node:
+        return
 
+    message = await node.get_data()
     await message.remove_reaction(event.emoji_name, user=event.member.id)
 
     if not message:

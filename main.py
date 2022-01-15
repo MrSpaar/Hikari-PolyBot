@@ -2,7 +2,7 @@ from hikari import StartedEvent, Activity
 
 from src.bot import Bot
 
-bot = Bot(True)
+bot = Bot()
 
 
 @bot.listen(StartedEvent)
