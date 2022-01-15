@@ -15,7 +15,7 @@ from lightbulb import (
     guild_only,
 )
 
-from src.cooldown import Cooldown
+from src.cd import Cooldown
 
 cd = Cooldown(1, 60)
 plugin = Plugin("Niveaux")
