@@ -28,7 +28,7 @@ async def on_member_join(event):
     guild, member = plugin.bot.cache.get_guild(event.guild_id), event.member
 
     embed = Embed(color=0x2ECC71, description=f":inbox_tray: {member.mention} a rejoint le serveur !")
-    settings = await send_log(guild, embed)
+    settings = await send_log(guild, [embed])
 
     if settings["welcome"]:
         channel = guild.get_channel(settings["welcome"]["id"])
@@ -80,7 +80,7 @@ async def on_member_unban(event):
     reason, user = entry.reason, guild.get_member(entry.user_id)
 
     embed = Embed(color=0xC27C0E, description=f"👨‍⚖️ {user.mention} a unban {target.mention}\n❔ Raison : {reason or 'Pas de raison'}",)
-    await send_log(guild, embed)
+    await send_log(guild, [embed])
 
 
 @plugin.listener(events.MemberUpdateEvent)

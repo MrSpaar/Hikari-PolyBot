@@ -165,8 +165,10 @@ async def on_message(event):
         return
 
     settings = await plugin.bot.db.fetch_settings(guild.id)
-    channel = guild.get_channel(settings["channel"])
+    if settings["channel"]:
+        return
 
+    channel = guild.get_channel(settings["channel"])
     if channel:
         embed = Embed(color=0xF1C40F, description=f"🆙 {event.message.author.mention} vient de monter niveau **{lvl}**.")
         await channel.send(embed=embed)
