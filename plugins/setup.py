@@ -25,6 +25,18 @@ plugin = Plugin("Configuration")
 plugin.add_checks(guild_only, has_guild_permissions(Permissions.ADMINISTRATOR))
 
 
+def get_snowflake(guild, value, cls=TextableGuildChannel):
+    if value is None:
+        return "`Non défini`"
+
+    if cls == TextableGuildChannel:
+        channel = guild.get_channel(value)
+        return channel.mention if channel else "`Non défini`"
+
+    role = guild.get_role(value)
+    return role.mention if role else "`Non défini`"
+
+
 @plugin.command()
 @command("set", "Modifier les paramètres du bot")
 @implements(SlashCommandGroup)
@@ -72,11 +84,11 @@ async def settings(ctx: Context):
     guild = ctx.get_guild()
     settings = await ctx.bot.db.fetch_settings(guild.id)
 
-    channel = getattr(guild.get_channel(settings["channel"]), "mention", "pas défini")
-    logs = getattr(guild.get_channel(settings["logs"]), "mention", "pas défini")
-    new = getattr(guild.get_role(settings["new"]), "mention", "pas défini")
+    channel = get_snowflake(guild, settings["channel"])
+    logs = get_snowflake(guild, settings["logs"])
+    new = get_snowflake(guild, settings["new"], Role)
 
-    embed = Embed(color=0x3498DB, description=f"💬 Bot : {channel}\n📟 Logs : {logs}\n🙍 Rôle des nouveaux : {new}",)
+    embed = Embed(color=0x3498DB, description=f"💬 Bot : {channel}\n📟 Logs : {logs}\n🙍 Rôle des nouveaux : {new}")
     await ctx.respond(embed=embed)
 
 
