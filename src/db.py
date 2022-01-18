@@ -78,7 +78,7 @@ class Database:
     async def fetch_leaderboard(self, guild_id: int) -> list:
         data = self.cluster["members"].find({"guilds.id": guild_id}, {"guilds.$": 1})
 
-        return await data.sort("guilds.xp", -1).to_list(length=None)
+        return await data.to_list(length=None)
 
     async def fetch_member(self, guild_id: int, member_id: int) -> list:
         data = await self.cluster["members"].find(

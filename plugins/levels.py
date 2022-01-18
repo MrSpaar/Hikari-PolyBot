@@ -43,6 +43,9 @@ def get_page(guild: GatewayGuild, entries: dict):
 
     for user_id, entry in entries.items():
         member = guild.get_member(user_id)
+        if not member:
+            continue
+
         level, xp = entry["level"], entry["xp"]
 
         bar = get_progress_bar(level + 1, xp, 5, True)
@@ -91,6 +94,7 @@ async def levels(ctx: Context):
     )
 
     data = await plugin.bot.db.fetch_leaderboard(guild.id)
+    data = list(sorted(data, reverse=True, key=lambda e: e['guilds'][0]['xp']))
     data = {
         entry["_id"]: entry["guilds"][0] | {"pos": i + 1}
         for i, entry in enumerate(data[:10])
@@ -122,6 +126,7 @@ async def on_reaction_add(event):
         return
 
     data = await plugin.bot.db.fetch_leaderboard(guild.id)
+    data = list(sorted(data, reverse=True, key=lambda e: e['guilds'][0]['xp']))
 
     embed, total = message.embeds[0], len(data) // 10 + (len(data) % 10 > 0)
     inc = -1 if event.emoji_name == "◀️" else 1
@@ -130,7 +135,7 @@ async def on_reaction_add(event):
     a, b = (1, 10) if page == 1 else (page * 10 - 9, page * 10)
     data = {
         entry["_id"]: entry["guilds"][0] | {"pos": i + a}
-        for i, entry in enumerate(data[a - 1 : b])
+        for i, entry in enumerate(data[a-1:b])
     }
 
     for i, field in enumerate(get_page(guild, data)):
