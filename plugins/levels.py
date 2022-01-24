@@ -170,7 +170,7 @@ async def on_message(event):
         return
 
     settings = await plugin.bot.db.fetch_settings(guild.id)
-    if settings["channel"]:
+    if settings["channel"] is None:
         return
 
     channel = guild.get_channel(settings["channel"])
