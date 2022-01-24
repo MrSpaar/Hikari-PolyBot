@@ -1,8 +1,4 @@
-plugins/minecraft.py
 __pycache__
+WIP
 .env
 .vscode
-lavalink
-club.py
-test.py
-polytech.py

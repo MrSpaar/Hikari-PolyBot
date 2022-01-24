@@ -88,7 +88,7 @@ async def on_member_update(event):
     guild = plugin.bot.cache.get_guild(event.guild_id)
     before, after = event.old_member, event.member
 
-    if not before or not after:
+    if not before or not after or before.username != after.username:
         return
 
     embed = Embed(color=0x3498DB)
