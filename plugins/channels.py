@@ -52,6 +52,9 @@ async def channel_delete(event):
         return
 
     before = guild.get_channel(event.old_state.channel_id)
+    if not before:
+        return
+
     entry = await plugin.bot.db.fetch_temp_channel(guild.id, voc_id=before.id)
 
     voice_states = filter(
