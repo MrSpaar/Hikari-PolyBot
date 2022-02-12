@@ -35,16 +35,13 @@ async def twitch(ctx: Context):
     count = 100 if ctx.options.recherche else 10
     query = f"https://api.twitch.tv/helix/search/channels?query={ctx.options.categorie}&first={count}&live_only=true"
 
+    if datetime.now() > plugin.bot.twitch["expire"]:
+        plugin.bot.twitch = get_oauth()
+
     headers = {
         "Client-ID": environ["TWITCH_CLIENT"],
-        "Authorization": f"Bearer {plugin.bot.twitch_token}",
+        "Authorization": f"Bearer {plugin.bot.twitch['token']}",
     }
-
-    resp = await api_call(query, headers)
-
-    if 'error' in resp:
-        plugin.bot.twitch_token = await get_oauth()
-        headers["Authorization"] = f"Bearer {plugin.bot.twitch_token}"
 
     resp = (await api_call(query, headers))["data"]
 

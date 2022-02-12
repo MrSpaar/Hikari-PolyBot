@@ -19,6 +19,6 @@ class Bot(BotApp):
             logs="ERROR",
         )
 
+        self.twitch = {}
         self.db = Database()
-        self.twitch_token = None
         self.data = type("Data", (), {"lavalink": None})

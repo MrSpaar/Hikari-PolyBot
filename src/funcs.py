@@ -20,9 +20,12 @@ async def api_call(link: str, headers: dict = None, post: bool = False, json: bo
 
 async def get_oauth():
     client, secret = environ["TWITCH_CLIENT"], environ["TWITCH_TOKEN"]
-    req = await api_call(f"https://id.twitch.tv/oauth2/token?client_id={client}&client_secret={secret}&grant_type=client_credentials", post=True)
+    data = await api_call(f"https://id.twitch.tv/oauth2/token?client_id={client}&client_secret={secret}&grant_type=client_credentials", post=True)
 
-    return req["access_token"]
+    return {
+        "token": data["access_token"],
+        "expire": datetime.now() + timedelta(seconds=data["expires_in"])
+    }
 
 
 def normalize_string(s: str) -> str:
