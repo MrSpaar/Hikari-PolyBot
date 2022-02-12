@@ -5,12 +5,24 @@ from datetime import datetime, timedelta
 from unicodedata import normalize
 from aiohttp import ClientSession
 from typing import Union
+from os import environ
 
 
-async def api_call(link: str, headers: dict = None, json: bool = True) -> Union[dict, str]:
+async def api_call(link: str, headers: dict = None, post: bool = False, json: bool = True) -> Union[dict, str]:
     async with ClientSession() as s:
+        if post:
+            async with s.post(link, headers=headers) as resp:
+                return await resp.json() if json else await resp.text()
+
         async with s.get(link, headers=headers) as resp:
             return await resp.json() if json else await resp.text()
+
+
+async def get_oauth():
+    client, secret = environ["TWITCH_CLIENT"], environ["TWITCH_TOKEN"]
+    req = await api_call(f"https://id.twitch.tv/oauth2/token?client_id={client}&client_secret={secret}&grant_type=client_credentials", post=True)
+
+    return req["access_token"]
 
 
 def normalize_string(s: str) -> str:

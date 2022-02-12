@@ -1,6 +1,7 @@
 from hikari import StartedEvent, Activity
 
 from src.bot import Bot
+from src.funcs import get_oauth
 
 
 def main():
@@ -9,6 +10,7 @@ def main():
 
     @bot.listen(StartedEvent)
     async def ready(_):
+        bot.twitch_token = await get_oauth()
         print("Bot is ready")
 
 

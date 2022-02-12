@@ -10,7 +10,7 @@ from lightbulb import (
     implements,
 )
 
-from src.funcs import api_call
+from src.funcs import api_call, get_oauth
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 from io import BytesIO
@@ -32,29 +32,35 @@ async def search(ctx: Context):
 @command("twitch", "Rechercher des streams Twitch")
 @implements(SlashSubCommand)
 async def twitch(ctx: Context):
-    query = f"https://api.twitch.tv/kraken/search/streams?query={ctx.options.categorie}&limit={100 if ctx.options.recherche else 10}"
+    count = 100 if ctx.options.recherche else 10
+    query = f"https://api.twitch.tv/helix/search/channels?query={ctx.options.categorie}&first={count}&live_only=true"
 
     headers = {
-        "Accept": "application/vnd.twitchtv.v5+json",
         "Client-ID": environ["TWITCH_CLIENT"],
-        "Authorization": f"Bearer {environ['TWITCH_TOKEN']}",
+        "Authorization": f"Bearer {plugin.bot.twitch_token}",
     }
 
-    resp = (await api_call(query, headers))["streams"]
+    resp = await api_call(query, headers)
+
+    if 'error' in resp:
+        plugin.bot.twitch_token = await get_oauth()
+        headers["Authorization"] = f"Bearer {plugin.bot.twitch_token}"
+
+    resp = (await api_call(query, headers))["data"]
+
     embed = Embed(color=0x3498DB)
-    embed.set_author(name=f"Twitch - {resp[0]['game']}", icon="https://i.imgur.com/gArdgyC.png")
+    embed.set_author(name=f"Twitch - {resp[0]['game_name']}", icon="https://i.imgur.com/gArdgyC.png")
 
     if not ctx.options.recherche:
         streams = resp[:10]
     else:
         streams = filter(
-            lambda s: any(key in s["channel"]["status"].lower() for key in ctx.options.recherche.split()),
+            lambda s: any(key in s["title"].lower() for key in ctx.options.recherche.split()),
             resp[:100]
         )
 
     for stream in streams:
-        stream = stream["channel"]
-        value = f"[{stream['status']}]({stream['url']})"
+        value = f"[{stream['title']}](https://www.twitch.tv/{stream['broadcaster_login']})"
         embed.add_field(name=stream["display_name"], value=value, inline=True)
 
     if len(embed.fields) == 0:

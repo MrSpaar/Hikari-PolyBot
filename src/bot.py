@@ -20,4 +20,5 @@ class Bot(BotApp):
         )
 
         self.db = Database()
+        self.twitch_token = None
         self.data = type("Data", (), {"lavalink": None})
