@@ -28,7 +28,7 @@ class Chess:
         try:
             event = await self.ctx.bot.wait_for(GuildReactionAddEvent, timeout=300,
                                             predicate=lambda e: e.emoji_name in ['✅', '❌'] and e.member.id == self.opponent.id)
-        except:
+        except TimeoutError:
             return await self.edit_message(color=0xe74c3c, text="❌ L'adversaire n'a pas accepté la partie à temps")
 
         await self.message.remove_all_reactions()
@@ -70,7 +70,7 @@ class Chess:
             try:
                 m = self.board.parse_san(event.message.content)
                 self.board.push(m)
-            except:
+            except Exception:
                 await self.play()
             else:
                 await event.message.delete()

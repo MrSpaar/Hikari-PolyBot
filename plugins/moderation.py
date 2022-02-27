@@ -37,7 +37,7 @@ async def clear(ctx: Context):
         if len(messages) >= ctx.options.x:
             break
 
-        messages += [message]
+        messages.append(message)
 
     await channel.delete_messages(messages)
     await ctx.respond(f'{ctx.options.x} message supprimés', flags=MessageFlag.EPHEMERAL)
@@ -85,7 +85,7 @@ async def unban(ctx: Context):
 
         embed = Embed(color=0x2ECC71, description=f"✅ `{user.mention}` a été unban")
         await ctx.respond(embed=embed)
-    except:
+    except Exception:
         embed = Embed(color=0xE74C3C, description="❌ L'utilisateur n'est pas banni de ce serveur")
         await ctx.send(embed=embed)
 

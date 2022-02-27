@@ -59,7 +59,7 @@ async def on_member_ban(event):
 
     try:
         entry = await get_audit_log(guild, AuditLogEventType.MEMBER_BAN_ADD)
-    except:
+    except Exception:
         return
 
     reason, user = entry.reason, guild.get_member(entry.user_id)
@@ -74,7 +74,7 @@ async def on_member_unban(event):
 
     try:
         entry = await get_audit_log(guild, AuditLogEventType.MEMBER_BAN_REMOVE)
-    except:
+    except Exception:
         return
 
     reason, user = entry.reason, guild.get_member(entry.user_id)
@@ -96,7 +96,7 @@ async def on_member_update(event):
     if before.display_name != after.display_name:
         try:
             entry = await get_audit_log(guild, AuditLogEventType.MEMBER_UPDATE)
-        except:
+        except Exception:
             return
 
         member = guild.get_member(entry.user_id)
@@ -108,7 +108,7 @@ async def on_member_update(event):
     elif (broles := before.get_roles()) != (aroles := after.get_roles()):
         try:
             entry = await get_audit_log(guild, AuditLogEventType.MEMBER_ROLE_UPDATE)
-        except:
+        except Exception:
             return
 
         member = guild.get_member(entry.user_id)
@@ -166,10 +166,10 @@ async def on_message_delete(event):
 
     if attachments["images"]:
         embeds[0].set_image(attachments["images"][0])
-        embeds += [
+        embeds.extend([
             (Embed(color=0xF1C40F).set_image(image))
             for image in attachments["images"][1:]
-        ]
+        ])
 
     await send_log(guild, embeds, attachments["other"])
 

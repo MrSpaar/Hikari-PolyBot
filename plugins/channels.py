@@ -39,7 +39,7 @@ async def channel_create(event):
     try:
         await member.edit(voice_channel=channel)
         await plugin.bot.db.insert_temp_channel(guild.id, member.id, channel.id, text.id)
-    except:
+    except Exception:
         await channel.delete()
         await text.delete()
 

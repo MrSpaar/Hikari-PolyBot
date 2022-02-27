@@ -55,7 +55,7 @@ async def base(ctx: Context):
 
     try:
         conv = base_conv(ctx.options.nombre, ctx.options.base_initiale, ctx.options.base_arrivee)
-    except:
+    except Exception:
         embed = Embed(color=0xE74C3C, description="❌ Erreur dans la conversion")
     else:
         embed = Embed(color=0x3498DB, description=f"⚙️ `{ctx.options.nombre}` en base {ctx.options.base_arrivee} : `{conv}`")
@@ -70,7 +70,7 @@ async def base(ctx: Context):
 async def binaire(ctx: Context):
     try:
         conv = [bin(int(ctx.options.texte))[2:]]
-    except:
+    except Exception:
         conv = [bin(s)[2:] for s in bytearray(ctx.options.texte, "utf-8")]
 
     embed = Embed(color=0x3498DB, description=f'⚙️ `{ctx.options.texte}` = `{"".join(conv)}`')

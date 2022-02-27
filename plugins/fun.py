@@ -107,10 +107,10 @@ async def roll(ctx: Context):
 
         for elem in content:
             n, faces = elem.split("d") if elem.split("d")[0] != "" else (1, elem[1:])
-            rolls += [randint(1, int(faces)) for _ in range(int(n))]
+            rolls.append(randint(1, int(faces)) for _ in range(int(n)))
 
         rolls_str = " + ".join([str(n) for n in rolls])
-    except:
+    except Exception:
         embed = Embed(color=0xE74C3C, description="❌ Lancer invalide")
         return await ctx.respond(embed=embed)
 

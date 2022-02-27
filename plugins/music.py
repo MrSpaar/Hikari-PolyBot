@@ -1,15 +1,6 @@
 from hikari import Embed, Message, ShardReadyEvent, GuildReactionAddEvent, MessageFlag
 from lavasnek_rs import Lavalink, LavalinkBuilder, Track
-from lightbulb import (
-    Plugin,
-    Context,
-    SlashCommand,
-    OptionModifier,
-    command,
-    option,
-    implements,
-    guild_only,
-)
+from lightbulb import Plugin, Context, SlashCommand, OptionModifier, command, option, implements, guild_only
 
 
 class EventHandler:
@@ -36,7 +27,7 @@ async def update_queue(lavalink: Lavalink, guild_id: int, track: Track = None):
     if node and not node.now_playing and not node.queue:
         return await stop(lavalink, guild_id)
 
-    message = await node.get_data()
+    message = node.get_data()
     embeds = message.embeds
     np = node.queue[0]
 
@@ -55,7 +46,7 @@ async def update_queue(lavalink: Lavalink, guild_id: int, track: Track = None):
 async def stop(lavalink, guild_id):
     node = await lavalink.get_guild_node(guild_id)
     try: await node.get_data().delete()
-    except: pass
+    except Exception: pass
 
     await lavalink.destroy(guild_id)
     await lavalink.leave(guild_id)
