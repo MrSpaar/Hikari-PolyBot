@@ -22,7 +22,7 @@ plugin = Plugin("Recherche")
 @plugin.command()
 @command("recherche", "Groupes de commandes en rapport avec la recherche")
 @implements(SlashCommandGroup)
-async def search(ctx: Context):
+async def search(_):
     pass
 
 
