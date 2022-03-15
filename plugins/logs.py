@@ -25,7 +25,7 @@ async def send_log(guild: GatewayGuild, embeds: list[Embed], attachments: list[A
 
 @plugin.listener(events.MemberCreateEvent)
 async def on_member_join(event):
-    guild, member = plugin.bot.cache.get_guild(event.guild_id), event.member
+    guild, member = event.get_guild(), event.member
 
     embed = Embed(color=0x2ECC71, description=f":inbox_tray: {member.mention} a rejoint le serveur !")
     settings = await send_log(guild, [embed])
@@ -46,7 +46,7 @@ async def on_member_remove(event):
     if not event.old_member:
         return
 
-    guild, member = plugin.bot.cache.get_guild(event.guild_id), event.old_member
+    guild, member = event.get_guild(), event.old_member
     name = f"{member.display_name} ({member})" if member.display_name else str(member)
 
     embed = Embed(color=0xE74C3C, description=f":outbox_tray: {name} a quitté le serveur")
@@ -55,7 +55,7 @@ async def on_member_remove(event):
 
 @plugin.listener(events.BanCreateEvent)
 async def on_member_ban(event):
-    guild, target = plugin.bot.cache.get_guild(event.guild_id), event.user
+    guild, target = event.get_guild(), event.user
 
     try:
         entry = await get_audit_log(guild, AuditLogEventType.MEMBER_BAN_ADD)
@@ -70,7 +70,7 @@ async def on_member_ban(event):
 
 @plugin.listener(events.BanDeleteEvent)
 async def on_member_unban(event):
-    guild, target = plugin.bot.cache.get_guild(event.guild_id), event.user
+    guild, target = event.get_guild(), event.user
 
     try:
         entry = await get_audit_log(guild, AuditLogEventType.MEMBER_BAN_REMOVE)
@@ -84,42 +84,54 @@ async def on_member_unban(event):
 
 
 @plugin.listener(events.MemberUpdateEvent)
-async def on_member_update(event):
-    guild = plugin.bot.cache.get_guild(event.guild_id)
+async def on_nickname_update(event):
+    guild = event.get_guild()
     before, after = event.old_member, event.member
 
-    if not before or not after or before.username != after.username:
+    if before.display_name == after.display_name:
+        return
+
+    try:
+        entry = await get_audit_log(guild, AuditLogEventType.MEMBER_UPDATE)
+    except Exception:
+        return
+
+    embed = Embed(color=0x3498DB)
+    member = guild.get_member(entry.user_id)
+
+    if after == member:
+        embed.description = f"📝 {member.mention} a changé son surnom (`{before.display_name}` → `{after.display_name}`)"
+    else:
+        embed.description = f"📝 {member.mention} a changé de surnom de {before.mention} (`{before.display_name}` → `{after.display_name}`)"
+
+    await send_log(guild, [embed])
+
+
+@plugin.listener(events.MemberUpdateEvent)
+async def on_role_update(event):
+    guild = event.get_guild()
+    before, after = event.old_member, event.member
+
+    aroles = after.get_roles()
+    broles = before.get_roles()
+
+    if aroles == broles:
+        return
+
+    try:
+        entry = await get_audit_log(guild, AuditLogEventType.MEMBER_ROLE_UPDATE)
+    except Exception:
         return
 
     embed = Embed(color=0x3498DB)
 
-    if before.display_name != after.display_name:
-        try:
-            entry = await get_audit_log(guild, AuditLogEventType.MEMBER_UPDATE)
-        except Exception:
-            return
+    member = guild.get_member(entry.user_id)
+    role, = set(broles) ^ set(aroles)
 
-        member = guild.get_member(entry.user_id)
-
-        if after == member:
-            embed.description = f"📝 {member.mention} a changé son surnom (`{before.display_name}` → `{after.display_name}`)"
-        else:
-            embed.description = f"📝 {member.mention} a changé de surnom de {before.mention} (`{before.display_name}` → `{after.display_name}`)"
-    elif (broles := before.get_roles()) != (aroles := after.get_roles()):
-        try:
-            entry = await get_audit_log(guild, AuditLogEventType.MEMBER_ROLE_UPDATE)
-        except Exception:
-            return
-
-        member = guild.get_member(entry.user_id)
-        role, = set(broles) ^ set(aroles)
-
-        if after == member:
-            embed.description = f"📝 {member.mention} s'est {'ajouté' if role in aroles else 'retiré'} {role.mention}"
-        else:
-            embed.description = f"📝 {member.mention} à {'ajouté' if role in aroles else 'retiré'} {role.mention} à {before.mention}"
+    if after == member:
+        embed.description = f"📝 {member.mention} s'est {'ajouté' if role in aroles else 'retiré'} {role.mention}"
     else:
-        return
+        embed.description = f"📝 {member.mention} à {'ajouté' if role in aroles else 'retiré'} {role.mention} à {before.mention}"
 
     await send_log(guild, [embed])
 
@@ -176,7 +188,7 @@ async def on_message_delete(event):
 
 @plugin.listener(events.InviteCreateEvent)
 async def on_invite_create(event):
-    invite, guild = event.invite, plugin.bot.cache.get_guild(event.guild_id)
+    invite, guild = event.invite, event.get_guild()
 
     if not invite.inviter:
         return
