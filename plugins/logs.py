@@ -112,7 +112,7 @@ async def on_member_update(event):
             return
 
         member = guild.get_member(entry.user_id)
-        role, = set(broles).symmetric_difference(set(aroles))
+        role, = set(broles) ^ set(aroles)
 
         if after == member:
             embed.description = f"📝 {member.mention} s'est {'ajouté' if role in aroles else 'retiré'} {role.mention}"
