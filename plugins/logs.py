@@ -88,7 +88,7 @@ async def on_nickname_update(event):
     guild = event.get_guild()
     before, after = event.old_member, event.member
 
-    if before.display_name == after.display_name:
+    if before.display_name == after.display_name or not before or not after:
         return
 
     try:
@@ -111,6 +111,9 @@ async def on_nickname_update(event):
 async def on_role_update(event):
     guild = event.get_guild()
     before, after = event.old_member, event.member
+
+    if not before or not after:
+        return
 
     aroles = after.get_roles()
     broles = before.get_roles()
