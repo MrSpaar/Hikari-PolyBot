@@ -8,22 +8,19 @@ PolyBot est **un bot discord multi-fonction**. Pour l'instant, il est **semi-pri
 
 |                                            Categorie                                            |                         Commandes                       |
 |-------------------------------------------------------------------------------------------------|---------------------------------------------------------|
-|[Fun](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/fun.py)                      | `chess` `pendu` `demineur` `coinflip` `roll` `reaction` |
+|[Fun](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/fun.py)                      | `chess` `pendu` `coinflip` `roll` `reaction`            |
 |[Musique](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/music.py)                | `play` `leave` `skip` `pause` `resume`                  |
 |[Recherche](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/search.py)             | `twitch` `youtube` `wikipedia` `anime` `meteo`          |
-|[Divers](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/misc.py)                  | `help` `poll` `pfp` `emoji` `repo` `code`               |
-|[Maths](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/maths.py)                  | `base` `binaire` `hexa` `calcul`                        |
+|[Divers](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/misc.py)                  | `poll` `pp` `emoji`                                     |
 |[Niveaux](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/levels.py)               | `rank` `levels`                                         |
-|[Channels Temporaires](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/channels.py)| `rename` `private` `owner`                              |
 
 ### • 🔒 Commandes admin
 
 |                                        Categorie                                        |                                  Commandes                                |
 |-----------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
 |[Modération](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/moderation.py)| `clear` `kick` `ban` `unban`                                              |
-|[Infos](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/informations.py)   | `serverinfo` `userinfo` `roleinfo`                                        |
+|[Infos](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/informations.py)   | `info server` `info user` `info role`                                     |
 |[Menus](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/utility.py)        | `menu`                                                                    |
-|[Setup](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/setup.py)          | `set` `settings`                                                          |
 
 # Modules supplémentaires
 
