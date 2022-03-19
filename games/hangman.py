@@ -2,7 +2,7 @@ from hikari import Embed, Message, MessageCreateEvent
 from lightbulb import Context
 
 from random import choice, randint
-from src.funcs import normalize_string
+from core.funcs import normalize_string
 
 
 class Hangman:
