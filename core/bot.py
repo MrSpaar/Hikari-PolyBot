@@ -2,7 +2,7 @@ from hikari import Intents
 from lightbulb import BotApp
 
 from os import environ
-from src.db import Database
+from core.db import Database
 from dotenv import load_dotenv
 
 

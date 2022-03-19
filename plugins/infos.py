@@ -1,14 +1,5 @@
 from hikari import Embed, Member, Role, GuildTextChannel, Permissions
-from lightbulb import (
-    Plugin,
-    Context,
-    SlashCommandGroup,
-    SlashSubCommand,
-    command,
-    option,
-    implements,
-    guild_only,
-)
+from lightbulb import Plugin, Context, SlashCommandGroup, SlashSubCommand, command, option, implements, guild_only
 
 from time import mktime
 

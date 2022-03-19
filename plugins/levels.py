@@ -1,21 +1,7 @@
-from hikari import (
-    Member,
-    Embed,
-    GatewayGuild,
-    GuildReactionAddEvent,
-    GuildMessageCreateEvent,
-)
-from lightbulb import (
-    Plugin,
-    Context,
-    SlashCommand,
-    command,
-    option,
-    implements,
-    guild_only,
-)
+from hikari import Member,Embed, GatewayGuild, GuildReactionAddEvent, GuildMessageCreateEvent
+from lightbulb import Plugin, Context, SlashCommand, command, option, implements, guild_only
 
-from src.cd import Cooldown
+from core.cd import Cooldown
 
 cd = Cooldown(1, 60)
 plugin = Plugin("Niveaux")

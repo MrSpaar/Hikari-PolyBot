@@ -1,7 +1,7 @@
 from hikari import Embed, GatewayGuild, AuditLogEventType, Attachment, events
 from lightbulb import Plugin
 
-from src.funcs import now
+from core.funcs import now
 from time import mktime
 
 plugin = Plugin("Logs")

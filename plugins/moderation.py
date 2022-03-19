@@ -1,7 +1,7 @@
 from hikari import Member, Embed, Permissions, MessageFlag
 from lightbulb import Plugin, Context, SlashCommand, OptionModifier, command, option, implements, add_checks, guild_only, has_guild_permissions
 
-from src.funcs import is_higher
+from core.funcs import is_higher
 
 plugin = Plugin("Moderation")
 plugin.add_checks(guild_only)

@@ -1,17 +1,6 @@
 from hikari import Permissions, InteractionCreateEvent, GuildMessageCreateEvent, MessageFlag
 from hikari.impl import ActionRowBuilder
-from lightbulb import (
-    RoleConverter,
-    Plugin,
-    Context,
-    SlashCommand,
-    OptionModifier,
-    command,
-    option,
-    implements,
-    guild_only,
-    has_guild_permissions,
-)
+from lightbulb import RoleConverter, Plugin, Context, SlashCommand, OptionModifier, command, option, implements, guild_only, has_guild_permissions
 
 plugin = Plugin("Menus")
 plugin.add_checks(guild_only | has_guild_permissions(Permissions.MANAGE_ROLES))

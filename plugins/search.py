@@ -1,16 +1,7 @@
 from hikari import Embed, MessageFlag
-from lightbulb import (
-    Plugin,
-    Context,
-    SlashCommandGroup,
-    SlashSubCommand,
-    OptionModifier,
-    command,
-    option,
-    implements,
-)
+from lightbulb import Plugin, Context, SlashCommandGroup, SlashSubCommand, OptionModifier, command, option, implements
 
-from src.funcs import api_call, get_oauth
+from core.funcs import api_call, get_oauth
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 from io import BytesIO
