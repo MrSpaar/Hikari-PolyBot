@@ -1,7 +1,7 @@
 from hikari import StartedEvent, Activity
 
-from src.bot import Bot
-from src.funcs import get_oauth
+from core.bot import Bot
+from core.funcs import get_oauth
 
 
 def main():
