@@ -88,7 +88,7 @@ async def on_nickname_update(event):
     guild = event.get_guild()
     before, after = event.old_member, event.member
 
-    if before.display_name == after.display_name or not before or not after:
+    if not before or not after or before.display_name == after.display_name:
         return
 
     try:
