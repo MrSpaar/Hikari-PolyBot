@@ -10,7 +10,7 @@ def main():
 
     @bot.listen(StartedEvent)
     async def ready(_):
-        bot.twitch = await get_oauth()
+        # bot.twitch = await get_oauth()
         print("Bot is ready")
 
 
