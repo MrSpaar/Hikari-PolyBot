@@ -55,7 +55,7 @@ async def rank(ctx: Context):
     data = await plugin.bot.db.fetch_leaderboard(guild.id)
     data = {
         entry["_id"]: entry["guilds"][0] | {"pos": i + 1}
-        for i, entry in enumerate(data)
+        for i, entry in enumerate(sorted(data, reverse=True, key=lambda e: e['guilds'][0]["xp"]))
     }
 
     embed = Embed(color=0x3498DB)
