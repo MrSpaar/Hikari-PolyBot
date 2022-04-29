@@ -21,7 +21,7 @@ async def clear(ctx: Context):
         messages.append(message)
 
     await channel.delete_messages(messages)
-    await ctx.respond(f'{ctx.options.x} message supprimés', flags=MessageFlag.EPHEMERAL)
+    await ctx.respond(f'{len(messages)} message supprimés', flags=MessageFlag.EPHEMERAL)
 
 
 @plugin.command()
