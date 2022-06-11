@@ -87,7 +87,7 @@ async def create_client(_):
 
 
 @plugin.command()
-@option("texte", "Le titre de la vidéo", modifier=OptionModifier.CONSUME_REST)
+@option("lien", "Lien vers la vidéo a écouter", modifier=OptionModifier.CONSUME_REST)
 @command("play", "Écouter une vidéo dans le channel où vous êtes connecté")
 @implements(SlashCommand)
 async def play(ctx: Context):
@@ -99,7 +99,7 @@ async def play(ctx: Context):
 
     if not query.tracks:
         embed = Embed(color=0xE74C3C, description="❌ Aucun résultat correspondant à ta recherche")
-        return await ctx.respond(embed=embed)
+        return await ctx.respond(embed=embed, flags=MessageFlag.EPHEMERAL)
 
     track = query.tracks[0]
     node = await plugin.bot.d.lavalink.get_guild_node(ctx.guild_id)
