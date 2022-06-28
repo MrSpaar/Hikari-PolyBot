@@ -1,6 +1,7 @@
-from hikari import Member,Embed, GatewayGuild, GuildReactionAddEvent, GuildMessageCreateEvent
+from hikari import Member, Embed, Guild, GuildReactionAddEvent, GuildMessageCreateEvent
 from lightbulb import Plugin, Context, SlashCommand, command, option, implements, guild_only
 
+from core.db import DB
 from core.cd import Cooldown
 
 cd = Cooldown(1, 60)
@@ -24,7 +25,7 @@ def get_progress_bar(level: int, xp: int, n: int, short: bool = False):
     return f"{'🟩'*p}{'⬛' * (n-p)} {progress} / {needed}"
 
 
-def get_page(guild: GatewayGuild, entries: dict):
+def get_page(guild: Guild, entries: dict):
     field1, field2, field3 = "", "", ""
 
     for user_id, entry in entries.items():
@@ -52,7 +53,7 @@ async def rank(ctx: Context):
     guild = ctx.get_guild()
     member = ctx.options.membre or ctx.member
 
-    data = await plugin.bot.db.fetch_leaderboard(guild.id)
+    data = await DB.fetch_leaderboard(guild.id)
     data = {
         entry["_id"]: entry["guilds"][0] | {"pos": i + 1}
         for i, entry in enumerate(sorted(data, reverse=True, key=lambda e: e['guilds'][0]["xp"]))
@@ -79,7 +80,7 @@ async def levels(ctx: Context):
         .set_footer(text="Page 1")
     )
 
-    data = await plugin.bot.db.fetch_leaderboard(guild.id)
+    data = await DB.fetch_leaderboard(guild.id)
     data = list(sorted(data, reverse=True, key=lambda e: e['guilds'][0]['xp']))
     data = {
         entry["_id"]: entry["guilds"][0] | {"pos": i + 1}
@@ -111,7 +112,7 @@ async def on_reaction_add(event):
     ):
         return
 
-    data = await plugin.bot.db.fetch_leaderboard(guild.id)
+    data = await DB.fetch_leaderboard(guild.id)
     data = list(sorted(data, reverse=True, key=lambda e: e['guilds'][0]['xp']))
 
     embed, total = message.embeds[0], len(data) // 10 + (len(data) % 10 > 0)
@@ -143,19 +144,19 @@ async def on_message(event):
     if not cd.update_cooldown(member, guild):
         return
 
-    entry = await plugin.bot.db.fetch_member(guild.id, member.id)
+    entry = await DB.fetch_member(guild.id, member.id)
     if not entry:
         return
 
     xp, lvl = entry["guilds"][0]["xp"], entry["guilds"][0]["level"] + 1
     next_lvl = 5 / 6 * lvl * (2 * lvl ** 2 + 27 * lvl + 91)
 
-    await plugin.bot.db.update_member_xp(guild.id, member.id, xp, next_lvl)
+    await DB.update_member_xp(guild.id, member.id, xp, next_lvl)
 
     if next_lvl > xp:
         return
 
-    settings = await plugin.bot.db.fetch_settings(guild.id)
+    settings = await DB.fetch_settings(guild.id)
     if settings["channel"] is None:
         return
 

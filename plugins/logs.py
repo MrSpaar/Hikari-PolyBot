@@ -1,8 +1,10 @@
-from hikari import Embed, GatewayGuild, AuditLogEventType, Attachment, events
 from lightbulb import Plugin
+from hikari import Embed, GatewayGuild, AuditLogEventType, Attachment, events
 
-from core.funcs import now
 from time import mktime
+from core.funcs import now
+from core.db import DB
+
 
 plugin = Plugin("Logs")
 
@@ -13,8 +15,8 @@ async def get_audit_log(guild, event):
     return entries[0].entries[log_id]
 
 
-async def send_log(guild: GatewayGuild, embeds: list[Embed], attachments: list[Attachment] = []) -> dict:
-    settings = await plugin.bot.db.fetch_settings(guild.id)
+async def send_log(guild: GatewayGuild, embeds: list[Embed], attachments: list[Attachment] = ()) -> dict:
+    settings = await DB.fetch_settings(guild.id)
     channel = guild.get_channel(settings["logs"])
 
     if channel:

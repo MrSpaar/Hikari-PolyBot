@@ -1,16 +1,13 @@
 from hikari import Intents
 from lightbulb import BotApp
 
+from abc import ABC
 from os import environ
-from core.db import Database
-from dotenv import load_dotenv
 
 
-class Bot(BotApp):
+class ExtendedBot(BotApp, ABC):
     def __init__(self):
-        load_dotenv()
-
-        guilds = (752921557214429316, 634339847108165632, 339045627478540288, 930077129411018793)
+        guilds = (752921557214429316, 634339847108165632, 339045627478540288)
 
         super().__init__(
             intents=Intents.ALL,
@@ -20,4 +17,3 @@ class Bot(BotApp):
         )
 
         self.twitch = {}
-        self.db = Database()

@@ -1,6 +1,8 @@
 from hikari import VoiceStateUpdateEvent
 from lightbulb import Plugin, guild_only
 
+from core.db import DB
+
 plugin = Plugin("Vocaux")
 plugin.add_checks(guild_only)
 
@@ -14,7 +16,7 @@ async def channel_create(event):
 
     member = event.state.member
     after = guild.get_channel(event.state.channel_id)
-    entry = await plugin.bot.db.fetch_temp_channel(guild.id, member_id=member.id)
+    entry = await DB.fetch_temp_channel(guild.id, member_id=member.id)
 
     if "Créer" not in after.name or member.is_bot or entry:
         return
@@ -38,7 +40,7 @@ async def channel_create(event):
 
     try:
         await member.edit(voice_channel=channel)
-        await plugin.bot.db.insert_temp_channel(guild.id, member.id, channel.id, text.id)
+        await DB.insert_temp_channel(guild.id, member.id, channel.id, text.id)
     except Exception:
         await channel.delete()
         await text.delete()
@@ -55,7 +57,7 @@ async def channel_delete(event):
     if not before:
         return
 
-    entry = await plugin.bot.db.fetch_temp_channel(guild.id, voc_id=before.id)
+    entry = await DB.fetch_temp_channel(guild.id, voc_id=before.id)
 
     voice_states = filter(
         lambda vs: guild.get_channel(vs.channel_id) == before,
@@ -70,7 +72,7 @@ async def channel_delete(event):
 
     await text.delete()
     await before.delete()
-    await plugin.bot.db.delete_temp_channel(entry)
+    await DB.delete_temp_channel(entry)
 
 
 def load(bot):
