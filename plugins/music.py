@@ -95,7 +95,7 @@ async def play(ctx: Context):
         if failed := await join(ctx):
             return
 
-    query = await plugin.bot.d.lavalink.auto_search_tracks(ctx.options.texte)
+    query = await plugin.bot.d.lavalink.auto_search_tracks(ctx.options.lien)
 
     if not query.tracks:
         embed = Embed(color=0xE74C3C, description="❌ Aucun résultat correspondant à ta recherche")
