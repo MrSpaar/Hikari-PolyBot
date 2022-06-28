@@ -127,6 +127,7 @@ async def roleinfo(ctx: Context):
         Permissions.VIEW_CHANNEL: "Voir les salons",
         Permissions.BAN_MEMBERS: "Bannier des membres",
         Permissions.KICK_MEMBERS: "Expulser des membres",
+        Permissions.MODERATE_MEMBERS: "Modérer les membres",
         Permissions.MUTE_MEMBERS: "Muter des membres",
         Permissions.MOVE_MEMBERS: "Bouger des membres",
         Permissions.DEAFEN_MEMBERS: "Rendre des membres sourds",
