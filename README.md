@@ -33,11 +33,9 @@ Ecrivez `!set channel <#channel>` pour définir le salon où le bot fait ses ann
 
 ### • ⏲️ [Channels temporaires](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/channels.py)
 
-Ce module permet d'avoir des channels vocaux temporaires :
-
-- Chaque channel contenant [ce prefix](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/channels.py#L18) génèrera un channel tempaire dès que quelqu'un le rejoindra.
-- Un channel écrit est généré et lié avec le channel temporaire.
-- Les deux sont supprimés dès que le channel vocal est vide.
+Ce module permet d'avoir des channels vocaux temporaires.<br>
+Les salons à rejoindre pour générer un salon temporaire doivent avoir [ce prefix](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/channels.py#L18) dans leur nom.<br>
+Une fois vide, ou si il n'y a que @PolyBot dans le channel, il se supprimera.
 
 ### • 📝 [Logs](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/logs.py)
 

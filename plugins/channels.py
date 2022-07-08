@@ -26,12 +26,6 @@ async def channel_create(event):
     else:
         overwrites = after.permission_overwrites.values()
 
-    text = await guild.create_text_channel(
-        name=f"Salon-de-{member.display_name}",
-        category=category,
-        permission_overwrites=overwrites,
-    )
-
     channel = await guild.create_voice_channel(
         name=f"Salon de {member.display_name}",
         category=category,
@@ -40,10 +34,9 @@ async def channel_create(event):
 
     try:
         await member.edit(voice_channel=channel)
-        await DB.insert_temp_channel(guild.id, member.id, channel.id, text.id)
+        await DB.insert_temp_channel(guild.id, member.id, channel.id)
     except Exception:
         await channel.delete()
-        await text.delete()
 
 
 @plugin.listener(VoiceStateUpdateEvent)
@@ -68,9 +61,6 @@ async def channel_delete(event):
     if not entry or count:
         return
 
-    text = guild.get_channel(entry["txt_id"])
-
-    await text.delete()
     await before.delete()
     await DB.delete_temp_channel(entry)
 
