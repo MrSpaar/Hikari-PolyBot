@@ -76,11 +76,12 @@ class DB:
         return None if not data else data[0]
 
     @staticmethod
-    async def insert_temp_channel(guild_id: int, member_id: int, voc_id: int) -> None:
+    async def insert_temp_channel(guild_id: int, member_id: int, voc_id: int, txt_id: int) -> None:
         await DB.cluster["pending"].insert_one({
             "_id": member_id,
             "guild_id": guild_id,
             "voc_id": voc_id,
+            "txt_id": txt_id,
         })
 
     @staticmethod
