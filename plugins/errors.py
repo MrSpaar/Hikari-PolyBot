@@ -8,6 +8,10 @@ plugin = Plugin("Erreurs")
 async def on_command_error(event):
     ctx, error = event.context, event.exception.__cause__
 
+    if error is None:
+        embed = Embed(color=0xE74C3C, description="❌ Une erreur inattendue est survenue")
+        return await ctx.respond(embed=embed, flags=MessageFlag.EPHEMERAL)
+
     handled = {
         errors.MissingRequiredPermission: "❌ Tu n'as pas la permission de faire ça",
         errors.MissingRequiredRole: "❌ Tu n'as pas la permission de faire ça",
