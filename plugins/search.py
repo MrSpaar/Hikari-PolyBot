@@ -18,7 +18,7 @@ async def search(_):
 
 
 @search.child
-@option("recherche", "Les mots-clés pour affiner la recherche", modifier=OptionModifier.GREEDY)
+@option("recherche", "Les mots-clés pour affiner la recherche", modifier=OptionModifier.GREEDY, required=False)
 @option("categorie", "La catégorie dans laquelle rechercher des streams")
 @command("twitch", "Rechercher des streams Twitch")
 @implements(SlashSubCommand)
