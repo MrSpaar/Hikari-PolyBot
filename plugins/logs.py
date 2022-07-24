@@ -104,7 +104,7 @@ async def on_nickname_update(event):
     if after == member:
         embed.description = f"📝 {member.mention} a changé son surnom (`{before.display_name}` → `{after.display_name}`)"
     else:
-        embed.description = f"📝 {member.mention} a changé de surnom de {before.mention} (`{before.display_name}` → `{after.display_name}`)"
+        embed.description = f"📝 {member.mention} a changé le surnom de {before.mention} (`{before.display_name}` → `{after.display_name}`)"
 
     await send_log(guild, [embed])
 
