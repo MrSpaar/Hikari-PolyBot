@@ -49,7 +49,7 @@ async def serverinfo(ctx: lb.Context):
 @info.child
 @lb.option("membre", "L'utilisateur dont tu veux voir les informations", hk.Member, default=None)
 @lb.command("user", "Afficher des informations à propos du serveur d'un membre")
-@lb.implements(lb.SlashSubCommand, lb.UserCommand)
+@lb.implements(lb.SlashSubCommand)
 async def userinfo(ctx: lb.Context):
     member = ctx.options.membre or ctx.options.target or ctx.member
 
@@ -99,6 +99,13 @@ async def userinfo(ctx: lb.Context):
     embed.set_author(name=f"{member} - {status}", icon=member.avatar_url)
 
     await ctx.respond(embed=embed)
+
+
+@plugin.command()
+@lb.command("Info", "Afficher des informations à propos du serveur d'un membre")
+@lb.implements(lb.UserCommand)
+async def _userinfo(ctx: lb.Context):
+    await userinfo(ctx)
 
 
 @info.child

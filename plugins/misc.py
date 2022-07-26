@@ -33,12 +33,19 @@ async def sondage(ctx: lb.Context):
 @plugin.command()
 @lb.option("membre", "Le membre dont tu veux afficher l'image de profil", hk.User, default=None)
 @lb.command("pp", "Afficher l'image de profil d'un membre")
-@lb.implements(lb.SlashCommand, lb.UserCommand)
+@lb.implements(lb.SlashCommand)
 async def pp(ctx: lb.Context):
     member = ctx.options.membre or ctx.options.target or ctx.member
     embed = hk.Embed(color=member.get_top_role().color).set_image(member.avatar_url)
 
     await ctx.respond(embed=embed)
+
+
+@plugin.command()
+@lb.command("Image de profil", "Afficher l'image de profil d'un membre")
+@lb.implements(lb.UserCommand)
+async def _pp(ctx: lb.Context):
+    await pp(ctx)
 
 
 @plugin.command()

@@ -22,8 +22,8 @@ async def chess(_):
 @chess.child
 @lb.add_checks(lb.guild_only)
 @lb.option("membre", "La personne contre qui tu veux jouer", hk.Member)
-@lb.command("chess", "Jouer aux échecs contre quelqu'un")
-@lb.implements(lb.SlashSubCommand, lb.UserCommand)
+@lb.command("play", "Jouer aux échecs contre quelqu'un")
+@lb.implements(lb.SlashSubCommand)
 async def chess(ctx: lb.Context):
     member = ctx.options.membre or ctx.options.target
     if member.is_bot or member == ctx.member:
@@ -31,6 +31,13 @@ async def chess(ctx: lb.Context):
 
     await ctx.respond("\u200b")
     await Chess(ctx).start()
+
+
+@plugin.command()
+@lb.command("Echecs", "Jouer aux échecs contre quelqu'un")
+@lb.implements(lb.UserCommand)
+async def _chess(ctx: lb.Context):
+    await chess(ctx)
 
 
 @plugin.command()
