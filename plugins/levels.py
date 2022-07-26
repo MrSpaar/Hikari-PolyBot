@@ -1,12 +1,12 @@
-from hikari import Member, Embed, Guild, GuildReactionAddEvent, GuildMessageCreateEvent
-from lightbulb import Plugin, Context, SlashCommand, command, option, implements, guild_only
+import hikari as hk
+import lightbulb as lb
 
 from core.db import DB
 from core.cd import Cooldown
 
 cd = Cooldown(1, 60)
-plugin = Plugin("Niveaux")
-plugin.add_checks(guild_only)
+plugin = lb.Plugin("Niveaux")
+plugin.add_checks(lb.guild_only)
 
 
 def get_progress_bar(level: int, xp: int, n: int, short: bool = False):
@@ -25,7 +25,7 @@ def get_progress_bar(level: int, xp: int, n: int, short: bool = False):
     return f"{'🟩'*p}{'⬛' * (n-p)} {progress} / {needed}"
 
 
-def get_page(guild: Guild, entries: dict):
+def get_page(guild: hk.Guild, entries: dict):
     field1, field2, field3 = "", "", ""
 
     for user_id, entry in entries.items():
@@ -46,10 +46,10 @@ def get_page(guild: Guild, entries: dict):
 
 
 @plugin.command()
-@option("membre", "Le membre dont tu veux voir le rang", Member, default=None)
-@command("rank", "Afficher le niveau d'un membre")
-@implements(SlashCommand)
-async def rank(ctx: Context):
+@lb.option("membre", "Le membre dont tu veux voir le rang", hk.Member, default=None)
+@lb.command("rank", "Afficher le niveau d'un membre")
+@lb.implements(lb.SlashCommand)
+async def rank(ctx: lb.Context):
     guild = ctx.get_guild()
     member = ctx.options.membre or ctx.member
 
@@ -59,7 +59,7 @@ async def rank(ctx: Context):
         for i, entry in enumerate(sorted(data, reverse=True, key=lambda e: e['guilds'][0]["xp"]))
     }
 
-    embed = Embed(color=0x3498DB)
+    embed = hk.Embed(color=0x3498DB)
     embed.set_author(name=f"Progression de {member.display_name}", icon=member.avatar_url)
 
     xp, lvl = data[member.id]["xp"], data[member.id]["level"] + 1
@@ -70,12 +70,12 @@ async def rank(ctx: Context):
 
 
 @plugin.command()
-@command("levels", description="Afficher le classement du serveur")
-@implements(SlashCommand)
-async def levels(ctx: Context):
+@lb.command("levels", description="Afficher le classement du serveur")
+@lb.implements(lb.SlashCommand)
+async def levels(ctx: lb.Context):
     guild = ctx.get_guild()
     embed = (
-        Embed(color=0x3498DB)
+        hk.Embed(color=0x3498DB)
         .set_author(name="Classement du serveur", icon=guild.icon_url)
         .set_footer(text="Page 1")
     )
@@ -97,7 +97,7 @@ async def levels(ctx: Context):
         await message.add_reaction(emoji)
 
 
-@plugin.listener(GuildReactionAddEvent)
+@plugin.listener(hk.GuildReactionAddEvent)
 async def on_reaction_add(event):
     guild, member = plugin.bot.cache.get_guild(event.guild_id), event.member
     if member.is_bot:
@@ -134,7 +134,7 @@ async def on_reaction_add(event):
     await message.remove_reaction(event.emoji_name, user=member.id)
 
 
-@plugin.listener(GuildMessageCreateEvent)
+@plugin.listener(hk.GuildMessageCreateEvent)
 async def on_message(event):
     guild, member = plugin.bot.cache.get_guild(event.guild_id), event.member
 
@@ -162,7 +162,7 @@ async def on_message(event):
 
     channel = guild.get_channel(settings["channel"])
     if channel:
-        embed = Embed(color=0xF1C40F, description=f"🆙 {event.message.author.mention} vient de monter niveau **{lvl}**.")
+        embed = hk.Embed(color=0xF1C40F, description=f"🆙 {event.message.author.mention} vient de monter niveau **{lvl}**.")
         await channel.send(embed=embed)
 
 

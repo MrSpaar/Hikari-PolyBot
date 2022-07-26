@@ -1,5 +1,5 @@
-from hikari import Embed, MessageFlag
-from lightbulb import Plugin, Context, SlashCommandGroup, SlashSubCommand, OptionModifier, command, option, implements
+import hikari as hk
+import lightbulb as lb
 
 from core.funcs import api_call, get_oauth
 from datetime import datetime, timedelta
@@ -7,27 +7,27 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 from os import environ
 
-plugin = Plugin("Recherche")
+plugin = lb.Plugin("Recherche")
 
 
 @plugin.command()
-@command("recherche", "Groupes de commandes en rapport avec la recherche")
-@implements(SlashCommandGroup)
+@lb.command("recherche", "Groupes de commandes en rapport avec la recherche")
+@lb.implements(lb.SlashCommandGroup)
 async def search(_):
     pass
 
 
 @search.child
-@option("recherche", "Les mots-clés pour affiner la recherche", modifier=OptionModifier.GREEDY, required=False)
-@option("categorie", "La catégorie dans laquelle rechercher des streams")
-@command("twitch", "Rechercher des streams Twitch")
-@implements(SlashSubCommand)
-async def twitch(ctx: Context):
+@lb.option("recherche", "Les mots-clés pour affiner la recherche", modifier=lb.OptionModifier.GREEDY, required=False)
+@lb.option("categorie", "La catégorie dans laquelle rechercher des streams")
+@lb.command("twitch", "Rechercher des streams Twitch")
+@lb.implements(lb.SlashSubCommand)
+async def twitch(ctx: lb.Context):
     count = 100 if ctx.options.recherche else 10
     query = f"https://api.twitch.tv/helix/search/channels?query={ctx.options.categorie}&first={count}&live_only=true"
 
     if datetime.now() > plugin.bot.twitch["expire"]:
-        plugin.bot.twitch = get_oauth()
+        plugin.bot.twitch = await get_oauth()
 
     headers = {
         "Client-ID": environ["TWITCH_CLIENT"],
@@ -36,7 +36,7 @@ async def twitch(ctx: Context):
 
     resp = (await api_call(query, headers))["data"]
 
-    embed = Embed(color=0x3498DB)
+    embed = hk.Embed(color=0x3498DB)
     embed.set_author(name=f"Twitch - {resp[0]['game_name']}", icon="https://i.imgur.com/gArdgyC.png")
 
     if not ctx.options.recherche:
@@ -58,10 +58,10 @@ async def twitch(ctx: Context):
 
 
 @search.child
-@option("recherche", "Le nom de l'article Wikipedia", modifier=OptionModifier.CONSUME_REST)
-@command("wikipedia", "Rechercher des articles wikipedia")
-@implements(SlashSubCommand)
-async def wikipedia(ctx: Context):
+@lb.option("recherche", "Le nom de l'article Wikipedia", modifier=lb.OptionModifier.CONSUME_REST)
+@lb.command("wikipedia", "Rechercher des articles wikipedia")
+@lb.implements(lb.SlashSubCommand)
+async def wikipedia(ctx: lb.Context):
     query = f"https://fr.wikipedia.org/w/api.php?action=opensearch&search={ctx.options.recherche}&namespace=0&limit=1"
     resp = list(await api_call(query))
     title, url = resp[1][0], resp[3][0]
@@ -74,7 +74,7 @@ async def wikipedia(ctx: Context):
     thumbnail = data["thumbnail"]["source"] if "thumbnail" in data.keys() else ""
 
     embed = (
-        Embed(color=0x546E7A, description=desc)
+        hk.Embed(color=0x546E7A, description=desc)
         .set_author(name=f"Wikipedia - {title}", icon="https://i.imgur.com/nDTQgbf.png")
         .set_thumbnail(thumbnail)
     )
@@ -83,10 +83,10 @@ async def wikipedia(ctx: Context):
 
 
 @search.child
-@option("nom", "Le nom de l'anime dont tu veux les informations", modifier=OptionModifier.CONSUME_REST,)
-@command("anime", "Rechercher des animes")
-@implements(SlashSubCommand)
-async def anime(ctx: Context):
+@lb.option("nom", "Le nom de l'anime dont tu veux les informations", modifier=lb.OptionModifier.CONSUME_REST,)
+@lb.command("anime", "Rechercher des animes")
+@lb.implements(lb.SlashSubCommand)
+async def anime(ctx: lb.Context):
     resp = await api_call(f"https://kitsu.io/api/edge/anime?filter[text]={ctx.options.nom}")
     data = resp["data"][0]
     anime = data["attributes"]
@@ -102,7 +102,7 @@ async def anime(ctx: Context):
     diff = f"{datetime.strptime(anime['startDate'], '%Y-%m-%d').strftime('%d/%m/%Y')} → {end}"
 
     embed = (
-        Embed(color=0x546E7A, description=anime["synopsis"])
+        hk.Embed(color=0x546E7A, description=anime["synopsis"])
         .add_field(name="🥇 Score", value=f"{anime['averageRating']}/100", inline=True)
         .add_field(name="🖥️ Épisodes", value=f"{ep} ({h:d}h{m:02d}min)", inline=True)
         .add_field(name="📅 Diffusion", value=diff, inline=True)
@@ -113,16 +113,16 @@ async def anime(ctx: Context):
 
 
 @search.child
-@option("ville", "Le nom de la ville dont tu veux la météo", modifier=OptionModifier.CONSUME_REST)
-@command("meteo", "Donne la météo d'une ville sur un jour")
-@implements(SlashSubCommand)
-async def meteo(ctx: Context):
+@lb.option("ville", "Le nom de la ville dont tu veux la météo", modifier=lb.OptionModifier.CONSUME_REST)
+@lb.command("meteo", "Donne la météo d'une ville sur un jour")
+@lb.implements(lb.SlashSubCommand)
+async def meteo(ctx: lb.Context):
     query = f"https://api.openweathermap.org/data/2.5/forecast?q={ctx.options.ville}&units=metric&APPID={environ['WEATHER_TOKEN']}"
     resp = await api_call(query)
 
     if resp["cod"] != '200':
-        embed = Embed(color=0xE74C3C, description="❌ Ville introuvable ou inexistante")
-        return await ctx.respond(embed=embed, flags=MessageFlag.EPHEMERAL)
+        embed = hk.Embed(color=0xE74C3C, description="❌ Ville introuvable ou inexistante")
+        return await ctx.respond(embed=embed, flags=hk.MessageFlag.EPHEMERAL)
 
     today, now = resp["list"][0], datetime.now()
     info = {
@@ -166,7 +166,7 @@ async def meteo(ctx: Context):
     stream.seek(0)
 
     embed = (
-        Embed(title=f"🌦️ Prévisions météo à {ctx.options.ville.title()}", color=0x3498DB)
+        hk.Embed(title=f"🌦️ Prévisions météo à {ctx.options.ville.title()}", color=0x3498DB)
         .add_field(name="\u200b", value=f"Vent : {info['wind']}", inline=True)
         .add_field(name="\u200b", value=f"Humidité : {info['humidity']}", inline=True)
         .add_field(name="\u200b", value=f"Pluie : {info['rain']}", inline=True)

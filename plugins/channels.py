@@ -1,13 +1,13 @@
-from hikari import VoiceStateUpdateEvent
-from lightbulb import Plugin, guild_only
+import hikari as hk
+import lightbulb as lb
 
 from core.db import DB
 
-plugin = Plugin("Vocaux")
-plugin.add_checks(guild_only)
+plugin = lb.Plugin("Vocaux")
+plugin.add_checks(lb.guild_only)
 
 
-@plugin.listener(VoiceStateUpdateEvent)
+@plugin.listener(hk.VoiceStateUpdateEvent)
 async def channel_create(event):
     guild = plugin.bot.cache.get_guild(event.guild_id)
 
@@ -46,7 +46,7 @@ async def channel_create(event):
         await text.delete()
 
 
-@plugin.listener(VoiceStateUpdateEvent)
+@plugin.listener(hk.VoiceStateUpdateEvent)
 async def channel_delete(event):
     guild = plugin.bot.cache.get_guild(event.guild_id)
 

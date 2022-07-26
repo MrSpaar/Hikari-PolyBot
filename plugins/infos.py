@@ -1,27 +1,27 @@
-from hikari import Embed, Member, Role, GuildTextChannel, Permissions
-from lightbulb import Plugin, Context, SlashCommandGroup, SlashSubCommand, command, option, implements, guild_only
+import hikari as hk
+import lightbulb as lb
 
 from time import mktime
 
-plugin = Plugin("Informations")
-plugin.add_checks(guild_only)
+plugin = lb.Plugin("Informations")
+plugin.add_checks(lb.guild_only)
 
 
 @plugin.command()
-@command("info", "Groupes de commandes en rapport avec les informations")
-@implements(SlashCommandGroup)
-async def info(ctx: Context):
+@lb.command("info", "Groupes de commandes en rapport avec les informations")
+@lb.implements(lb.SlashCommandGroup)
+async def info(_):
     pass
 
 
 @info.child
-@command("server", "Afficher des informations à propos du serveur")
-@implements(SlashSubCommand)
-async def serverinfo(ctx: Context):
+@lb.command("server", "Afficher des informations à propos du serveur")
+@lb.implements(lb.SlashSubCommand)
+async def serverinfo(ctx: lb.Context):
     guild = ctx.get_guild()
     channels = guild.get_channels().values()
 
-    text = len(list(filter(lambda c: isinstance(c, GuildTextChannel), channels)))
+    text = len(list(filter(lambda c: isinstance(c, hk.GuildTextChannel), channels)))
     voice = len(channels) - text
     emojis = [emoji.mention for emoji in guild.get_emojis().values()]
 
@@ -40,17 +40,17 @@ async def serverinfo(ctx: Context):
         + f"\nEmotes du serveur : {''.join(emojis)}" if emojis else ""
     )
 
-    embed = Embed(description=description, color=0x546E7A)
+    embed = hk.Embed(description=description, color=0x546E7A)
     embed.set_author(name=f"{guild.name} - {guild.id}", icon=guild.icon_url)
 
     await ctx.respond(embed=embed)
 
 
 @info.child
-@option("membre", "L'utilisateur dont tu veux voir les informations", Member, default=None)
-@command("user", "Afficher des informations à propos du serveur d'un membre")
-@implements(SlashSubCommand)
-async def userinfo(ctx: Context):
+@lb.option("membre", "L'utilisateur dont tu veux voir les informations", hk.Member, default=None)
+@lb.command("user", "Afficher des informations à propos du serveur d'un membre")
+@lb.implements(lb.SlashSubCommand)
+async def userinfo(ctx: lb.Context):
     member = ctx.options.membre or ctx.member
 
     activities = {
@@ -95,62 +95,62 @@ async def userinfo(ctx: Context):
         + ("\n🏃‍♂️ Activités :\n- " + "\n- ".join(activities) if activities else "")
     )
 
-    embed = Embed(color=0x1ABC9C, description=description)
+    embed = hk.Embed(color=0x1ABC9C, description=description)
     embed.set_author(name=f"{member} - {status}", icon=member.avatar_url)
 
     await ctx.respond(embed=embed)
 
 
 @info.child
-@option("role", "Le rôle dont tu veux voir les informations", Role)
-@command("role", "Afficher des informations à propos du serveur d'un rôle")
-@implements(SlashSubCommand)
-async def roleinfo(ctx: Context):
+@lb.option("role", "Le rôle dont tu veux voir les informations", hk.Role)
+@lb.command("role", "Afficher des informations à propos du serveur d'un rôle")
+@lb.implements(lb.SlashSubCommand)
+async def roleinfo(ctx: lb.Context):
     role = ctx.options.role
     since = int(mktime(role.created_at.timetuple()))
     guild = ctx.get_guild()
 
     perms = {
-        Permissions.ADMINISTRATOR: "Administrateur",
-        Permissions.MANAGE_GUILD: "Gérer le serveur",
-        Permissions.MANAGE_CHANNELS: "Gérer les salons",
-        Permissions.MANAGE_NICKNAMES: "Gérer les pseudos",
-        Permissions.MANAGE_THREADS: "Gérer les fils",
-        Permissions.START_EMBEDDED_ACTIVITIES: "Gérer les évènements",
-        Permissions.MANAGE_WEBHOOKS: "Gérer les webhooks",
-        Permissions.MANAGE_MESSAGES: "Gérer les messages",
-        Permissions.MANAGE_EMOJIS_AND_STICKERS: "Gérer les emojis et stickers",
-        Permissions.MANAGE_ROLES: "Gérer les rôles",
-        Permissions.VIEW_AUDIT_LOG: "Voir les logs",
-        Permissions.VIEW_GUILD_INSIGHTS: "Voir les analyses du serveur",
-        Permissions.USE_VOICE_ACTIVITY: "Voir les activités de voix",
-        Permissions.VIEW_CHANNEL: "Voir les salons",
-        Permissions.BAN_MEMBERS: "Bannier des membres",
-        Permissions.KICK_MEMBERS: "Expulser des membres",
-        Permissions.MODERATE_MEMBERS: "Modérer les membres",
-        Permissions.MUTE_MEMBERS: "Muter des membres",
-        Permissions.MOVE_MEMBERS: "Bouger des membres",
-        Permissions.DEAFEN_MEMBERS: "Rendre des membres sourds",
-        Permissions.ADD_REACTIONS: "Ajouter des réactions",
-        Permissions.CHANGE_NICKNAME: "Changer de pseudo",
-        Permissions.CREATE_INSTANT_INVITE: "Créer des invitations",
-        Permissions.MENTION_ROLES: "Mentionner everyone et les rôles",
-        Permissions.ATTACH_FILES: "Envoyer des fichiers",
-        Permissions.SEND_TTS_MESSAGES: "Envoyer des TTS",
-        Permissions.EMBED_LINKS: "Envoyer des intégrations",
-        Permissions.CREATE_PRIVATE_THREADS: "Créer des threads privés",
-        Permissions.CREATE_PUBLIC_THREADS: "Créer des threads publiques",
-        Permissions.SEND_MESSAGES_IN_THREADS: "Envoyer des messages dans un thread",
-        Permissions.SEND_MESSAGES: "Envoyer des messages",
-        Permissions.READ_MESSAGE_HISTORY: "Lire les historiques de messages",
-        Permissions.USE_APPLICATION_COMMANDS: "Utiliser les applications",
-        Permissions.USE_EXTERNAL_EMOJIS: "Utiliser les emojis externes",
-        Permissions.USE_EXTERNAL_STICKERS: "Utiliser les stickers externes",
-        Permissions.PRIORITY_SPEAKER: "Parler en prioritaire",
-        Permissions.REQUEST_TO_SPEAK: "Demander la parole",
-        Permissions.SPEAK: "Parler en vocal",
-        Permissions.STREAM: "Faire un stream",
-        Permissions.CONNECT: "Se connecter à un vocal",
+        hk.Permissions.ADMINISTRATOR: "Administrateur",
+        hk.Permissions.MANAGE_GUILD: "Gérer le serveur",
+        hk.Permissions.MANAGE_CHANNELS: "Gérer les salons",
+        hk.Permissions.MANAGE_NICKNAMES: "Gérer les pseudos",
+        hk.Permissions.MANAGE_THREADS: "Gérer les fils",
+        hk.Permissions.START_EMBEDDED_ACTIVITIES: "Gérer les évènements",
+        hk.Permissions.MANAGE_WEBHOOKS: "Gérer les webhooks",
+        hk.Permissions.MANAGE_MESSAGES: "Gérer les messages",
+        hk.Permissions.MANAGE_EMOJIS_AND_STICKERS: "Gérer les emojis et stickers",
+        hk.Permissions.MANAGE_ROLES: "Gérer les rôles",
+        hk.Permissions.VIEW_AUDIT_LOG: "Voir les logs",
+        hk.Permissions.VIEW_GUILD_INSIGHTS: "Voir les analyses du serveur",
+        hk.Permissions.USE_VOICE_ACTIVITY: "Voir les activités de voix",
+        hk.Permissions.VIEW_CHANNEL: "Voir les salons",
+        hk.Permissions.BAN_MEMBERS: "Bannier des membres",
+        hk.Permissions.KICK_MEMBERS: "Expulser des membres",
+        hk.Permissions.MODERATE_MEMBERS: "Modérer les membres",
+        hk.Permissions.MUTE_MEMBERS: "Muter des membres",
+        hk.Permissions.MOVE_MEMBERS: "Bouger des membres",
+        hk.Permissions.DEAFEN_MEMBERS: "Rendre des membres sourds",
+        hk.Permissions.ADD_REACTIONS: "Ajouter des réactions",
+        hk.Permissions.CHANGE_NICKNAME: "Changer de pseudo",
+        hk.Permissions.CREATE_INSTANT_INVITE: "Créer des invitations",
+        hk.Permissions.MENTION_ROLES: "Mentionner everyone et les rôles",
+        hk.Permissions.ATTACH_FILES: "Envoyer des fichiers",
+        hk.Permissions.SEND_TTS_MESSAGES: "Envoyer des TTS",
+        hk.Permissions.EMBED_LINKS: "Envoyer des intégrations",
+        hk.Permissions.CREATE_PRIVATE_THREADS: "Créer des threads privés",
+        hk.Permissions.CREATE_PUBLIC_THREADS: "Créer des threads publiques",
+        hk.Permissions.SEND_MESSAGES_IN_THREADS: "Envoyer des messages dans un thread",
+        hk.Permissions.SEND_MESSAGES: "Envoyer des messages",
+        hk.Permissions.READ_MESSAGE_HISTORY: "Lire les historiques de messages",
+        hk.Permissions.USE_APPLICATION_COMMANDS: "Utiliser les applications",
+        hk.Permissions.USE_EXTERNAL_EMOJIS: "Utiliser les emojis externes",
+        hk.Permissions.USE_EXTERNAL_STICKERS: "Utiliser les stickers externes",
+        hk.Permissions.PRIORITY_SPEAKER: "Parler en prioritaire",
+        hk.Permissions.REQUEST_TO_SPEAK: "Demander la parole",
+        hk.Permissions.SPEAK: "Parler en vocal",
+        hk.Permissions.STREAM: "Faire un stream",
+        hk.Permissions.CONNECT: "Se connecter à un vocal",
     }
 
     perms = [perms[perm] for perm in role.permissions]
@@ -163,7 +163,7 @@ async def roleinfo(ctx: Context):
         + ("\n- " + "\n- ".join(perms) if perms else " *pas de permissions*")
     )
 
-    embed = Embed(color=role.color, description=description)
+    embed = hk.Embed(color=role.color, description=description)
     embed.set_author(name=f"{role.name} - {role.id}", icon=guild.icon_url)
 
     await ctx.respond(embed=embed)

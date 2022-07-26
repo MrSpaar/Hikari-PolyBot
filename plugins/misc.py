@@ -1,19 +1,19 @@
-from hikari import Embed, User, Emoji
-from lightbulb import EmojiConverter, Plugin, Context, SlashCommand, OptionModifier, command, option, implements
+import hikari as hk
+import lightbulb as lb
 
-plugin = Plugin("Divers")
+plugin = lb.Plugin("Divers")
 
 
 @plugin.command()
-@option("texte", "Le texte au format Question | Option 1 | Option 2 | ...", modifier=OptionModifier.CONSUME_REST,)
-@command("sondage", description="Faire un sondage (9 choix au maximum)")
-@implements(SlashCommand)
-async def sondage(ctx: Context):
+@lb.option("texte", "Le texte au format Question | Option 1 | Option 2 | ...", modifier=lb.OptionModifier.CONSUME_REST,)
+@lb.command("sondage", description="Faire un sondage (9 choix au maximum)")
+@lb.implements(lb.SlashCommand)
+async def sondage(ctx: lb.Context):
     items = [arg.strip() for arg in ctx.options.texte.split("|")]
     question = items[0]
     reactions = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
 
-    embed = Embed(title=f">> {question[0].upper() + question[1:]}", color=0x3498DB)
+    embed = hk.Embed(title=f">> {question[0].upper() + question[1:]}", color=0x3498DB)
     embed.set_author(name=f"Sondage de {ctx.member.display_name}", icon=ctx.author.avatar_url)
 
     for i in range(1, len(items)):
@@ -31,25 +31,25 @@ async def sondage(ctx: Context):
 
 
 @plugin.command()
-@option("membre", "Le membre dont tu veux afficher l'image de profil", User, default=None)
-@command("pp", "Afficher l'image de profil d'un membre")
-@implements(SlashCommand)
-async def pp(ctx: Context):
+@lb.option("membre", "Le membre dont tu veux afficher l'image de profil", hk.User, default=None)
+@lb.command("pp", "Afficher l'image de profil d'un membre")
+@lb.implements(lb.SlashCommand)
+async def pp(ctx: lb.Context):
     member = ctx.options.membre or ctx.member
-    embed = Embed(color=member.get_top_role().color).set_image(member.avatar_url)
+    embed = hk.Embed(color=member.get_top_role().color).set_image(member.avatar_url)
 
     await ctx.respond(embed=embed)
 
 
 @plugin.command()
-@option("emoji", "L'emoji que tu veux afficher", Emoji)
-@command("emoji", description="Afficher l'image d'origine d'un emoji")
-@implements(SlashCommand)
-async def emoji(ctx: Context):
-    emoji = await EmojiConverter(ctx).convert(ctx.options.emoji)
+@lb.option("emoji", "L'emoji que tu veux afficher", hk.Emoji)
+@lb.command("emoji", description="Afficher l'image d'origine d'un emoji")
+@lb.implements(lb.SlashCommand)
+async def emoji(ctx: lb.Context):
+    emoji = await lb.EmojiConverter(ctx).convert(ctx.options.emoji)
 
     embed = (
-        Embed(color=ctx.member.get_top_role().color)
+        hk.Embed(color=ctx.member.get_top_role().color)
         .set_image(emoji.url)
         .set_footer(text=f"<:{emoji.name}:{emoji.id}>")
     )

@@ -1,16 +1,16 @@
-from hikari import Embed, Message, ShardReadyEvent, GuildReactionAddEvent, MessageFlag
-from lavasnek_rs import Lavalink, LavalinkBuilder, Track
-from lightbulb import Plugin, Context, SlashCommand, OptionModifier, command, option, implements, guild_only
+import hikari as hk
+import lightbulb as lb
+import lavasnek_rs as lrs
 
 
 class EventHandler:
-    async def track_finish(self, lavalink: Lavalink, event):
+    async def track_finish(self, lavalink: lrs.Lavalink, event):
         await update_queue(lavalink, event.guild_id)
 
 
-async def create_message(ctx: Context, track) -> Message:
-    embed1 = Embed(color=0x3498DB, description=f"🎵 [`{track.info.title}`]({track.info.uri}) de `{track.info.author}`\n🙍 Demandé par {ctx.author.mention}")
-    embed2 = Embed(color=0x99AAB5, description="*Pas de vidéos en attente*")
+async def create_message(ctx: lb.Context, track) -> hk.Message:
+    embed1 = hk.Embed(color=0x3498DB, description=f"🎵 [`{track.info.title}`]({track.info.uri}) de `{track.info.author}`\n🙍 Demandé par {ctx.author.mention}")
+    embed2 = hk.Embed(color=0x99AAB5, description="*Pas de vidéos en attente*")
 
     resp = await ctx.respond(embeds=[embed1, embed2])
     message = await resp.message()
@@ -21,7 +21,7 @@ async def create_message(ctx: Context, track) -> Message:
     return message
 
 
-async def update_queue(lavalink: Lavalink, guild_id: int, track: Track = None):
+async def update_queue(lavalink: lrs.Lavalink, guild_id: int, track: lrs.Track = None):
     node = await lavalink.get_guild_node(guild_id)
 
     if node and not node.now_playing and not node.queue:
@@ -45,8 +45,10 @@ async def update_queue(lavalink: Lavalink, guild_id: int, track: Track = None):
 
 async def stop(lavalink, guild_id):
     node = await lavalink.get_guild_node(guild_id)
-    try: await node.get_data().delete()
-    except Exception: pass
+    try:
+        await node.get_data().delete()
+    except Exception:
+        pass
 
     await lavalink.destroy(guild_id)
     await lavalink.leave(guild_id)
@@ -59,26 +61,26 @@ async def join(ctx):
     voice_state = list(filter(lambda i: i.user_id == ctx.author.id, states.iterator()))
 
     if not voice_state:
-        embed = Embed(color=0xE74C3C, description="❌ Tu n'es connecté à aucun salon vocal")
-        return await ctx.respond(embed=embed, flags=MessageFlag.EPHEMERAL)
+        embed = hk.Embed(color=0xE74C3C, description="❌ Tu n'es connecté à aucun salon vocal")
+        return await ctx.respond(embed=embed, flags=hk.MessageFlag.EPHEMERAL)
 
     try:
         connection_info = await plugin.bot.d.lavalink.join(ctx.guild_id, voice_state[0].channel_id)
     except TimeoutError:
-        embed = Embed(color=0xE74C3C, description="❌ Je n'ai pas pu rejoindre le salon")
-        return await ctx.respond(embed=embed, flags=MessageFlag.EPHEMERAL)
+        embed = hk.Embed(color=0xE74C3C, description="❌ Je n'ai pas pu rejoindre le salon")
+        return await ctx.respond(embed=embed, flags=hk.MessageFlag.EPHEMERAL)
 
     await plugin.bot.d.lavalink.create_session(connection_info)
 
 
-plugin = Plugin("Musique")
-plugin.add_checks(guild_only)
+plugin = lb.Plugin("Musique")
+plugin.add_checks(lb.guild_only)
 
 
-@plugin.listener(ShardReadyEvent)
+@plugin.listener(hk.ShardReadyEvent)
 async def create_client(_):
     builder = (
-        LavalinkBuilder(plugin.bot.get_me().id, plugin.bot._token)
+        lrs.LavalinkBuilder(plugin.bot.get_me().id, plugin.bot._token)
         .set_host("127.0.0.1")
         .set_password("")
     )
@@ -87,26 +89,26 @@ async def create_client(_):
 
 
 @plugin.command()
-@option("lien", "Lien vers la vidéo a écouter", modifier=OptionModifier.CONSUME_REST)
-@command("play", "Écouter une vidéo dans le channel où vous êtes connecté")
-@implements(SlashCommand)
-async def play(ctx: Context):
+@lb.option("lien", "Lien vers la vidéo a écouter", modifier=lb.OptionModifier.CONSUME_REST)
+@lb.command("play", "Écouter une vidéo dans le channel où vous êtes connecté")
+@lb.implements(lb.SlashCommand)
+async def play(ctx: lb.Context):
     if not plugin.bot.d.lavalink.get_guild_gateway_connection_info(ctx.guild_id):
-        if failed := await join(ctx):
+        if await join(ctx):
             return
 
     query = await plugin.bot.d.lavalink.auto_search_tracks(ctx.options.lien)
 
     if not query.tracks:
-        embed = Embed(color=0xE74C3C, description="❌ Aucun résultat correspondant à ta recherche")
-        return await ctx.respond(embed=embed, flags=MessageFlag.EPHEMERAL)
+        embed = hk.Embed(color=0xE74C3C, description="❌ Aucun résultat correspondant à ta recherche")
+        return await ctx.respond(embed=embed, flags=hk.MessageFlag.EPHEMERAL)
 
     track = query.tracks[0]
     node = await plugin.bot.d.lavalink.get_guild_node(ctx.guild_id)
 
     if node.now_playing:
         await update_queue(plugin.bot.d.lavalink, ctx.guild_id, track)
-        await ctx.respond("Musique ajoutée", flags=MessageFlag.EPHEMERAL)
+        await ctx.respond("Musique ajoutée", flags=hk.MessageFlag.EPHEMERAL)
     else:
         message = await create_message(ctx, track)
         node.set_data(message)
@@ -114,7 +116,7 @@ async def play(ctx: Context):
     await plugin.bot.d.lavalink.play(ctx.guild_id, track).requester(ctx.author.id).queue()
 
 
-@plugin.listener(GuildReactionAddEvent)
+@plugin.listener(hk.GuildReactionAddEvent)
 async def reaction_pressed(event):
     if event.member.is_bot:
         return
