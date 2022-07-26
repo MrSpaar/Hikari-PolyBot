@@ -48,10 +48,10 @@ def get_page(guild: hk.Guild, entries: dict):
 @plugin.command()
 @lb.option("membre", "Le membre dont tu veux voir le rang", hk.Member, default=None)
 @lb.command("rank", "Afficher le niveau d'un membre")
-@lb.implements(lb.SlashCommand)
+@lb.implements(lb.SlashCommand, lb.UserCommand)
 async def rank(ctx: lb.Context):
     guild = ctx.get_guild()
-    member = ctx.options.membre or ctx.member
+    member = ctx.options.membre or ctx.options.target or ctx.member
 
     data = await DB.fetch_leaderboard(guild.id)
     data = {

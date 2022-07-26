@@ -51,7 +51,7 @@ async def serverinfo(ctx: lb.Context):
 @lb.command("user", "Afficher des informations à propos du serveur d'un membre")
 @lb.implements(lb.SlashSubCommand, lb.UserCommand)
 async def userinfo(ctx: lb.Context):
-    member = ctx.options.membre or ctx.member
+    member = ctx.options.membre or ctx.options.target or ctx.member
 
     activities = {
         0: "En train de jouer à `{0.name}`",

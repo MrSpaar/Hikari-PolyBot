@@ -23,9 +23,10 @@ async def chess(_):
 @lb.add_checks(lb.guild_only)
 @lb.option("membre", "La personne contre qui tu veux jouer", hk.Member)
 @lb.command("chess", "Jouer aux échecs contre quelqu'un")
-@lb.implements(lb.SlashSubCommand)
+@lb.implements(lb.SlashSubCommand, lb.UserCommand)
 async def chess(ctx: lb.Context):
-    if ctx.options.membre.is_bot or ctx.options.membre == ctx.member:
+    member = ctx.options.membre or ctx.options.target
+    if member.is_bot or member == ctx.member:
         return await ctx.respond("Tu ne peux pas jouer contre un bot ou contre toi-même")
 
     await ctx.respond("\u200b")
