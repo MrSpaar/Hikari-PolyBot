@@ -29,7 +29,7 @@ async def clear(ctx: lb.Context):
 @lb.option("membre", "Le membre à exclure du serveur", hk.Member)
 @lb.option("raison", "La raison de l'exclusion", modifier=lb.OptionModifier.CONSUME_REST, default="Pas de raison")
 @lb.command("kick", "Exclure un membre du serveur")
-@lb.implements(lb.SlashCommand, lb.UserCommand)
+@lb.implements(lb.SlashCommand)
 async def kick(ctx: lb.Context):
     embed = hk.Embed(color=0x2ECC71, description=f"✅ {ctx.options.membre.mention} a été kick")
 
@@ -42,7 +42,7 @@ async def kick(ctx: lb.Context):
 @lb.option("membre", "Le membre à bannir", hk.Member)
 @lb.option("raison", "La raison du bannissement", modifier=lb.OptionModifier.CONSUME_REST, default="Pas de raison")
 @lb.command("ban", "Bannir un membre du serveur")
-@lb.implements(lb.SlashCommand, lb.UserCommand)
+@lb.implements(lb.SlashCommand)
 async def ban(ctx: lb.Context):
     embed = hk.Embed(color=0x2ECC71, description=f"✅ {ctx.options.membre.mention} a été ban")
 
