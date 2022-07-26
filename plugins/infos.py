@@ -49,7 +49,7 @@ async def serverinfo(ctx: lb.Context):
 @info.child
 @lb.option("membre", "L'utilisateur dont tu veux voir les informations", hk.Member, default=None)
 @lb.command("user", "Afficher des informations à propos du serveur d'un membre")
-@lb.implements(lb.SlashSubCommand)
+@lb.implements(lb.SlashSubCommand, lb.UserCommand)
 async def userinfo(ctx: lb.Context):
     member = ctx.options.membre or ctx.member
 
